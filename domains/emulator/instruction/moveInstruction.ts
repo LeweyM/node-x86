@@ -5,24 +5,17 @@ import {
   RightInstructionArg,
 } from './instruction';
 import { Emulator } from '../emulator';
-export class MoveInstruction implements Instruction {
+export class MoveInstruction extends Instruction implements Instruction {
   left;
   right;
   constructor(left: LeftInstructionArg, right: RightInstructionArg) {
+    super();
     this.left = left;
     this.right = right;
   }
 
   execute(e: Emulator): void {
-    let newValue;
-    switch (this.left.type) {
-      case InstructionArgType.CONSTANT:
-        newValue = this.left.value;
-        break;
-      case InstructionArgType.REGISTER:
-        newValue = e.registers[this.left.value];
-        break;
-    }
+    const newValue = super.getLeftValue(e, this.left);
 
     if (this.right.type == InstructionArgType.REGISTER) {
       const target = this.right.value;
@@ -30,7 +23,7 @@ export class MoveInstruction implements Instruction {
     }
     if (this.right.type == InstructionArgType.POINTER) {
       const memAddress = e.registers[this.right.value];
-      e.memory[memAddress] = newValue;
+      e.setMemory(memAddress, newValue);
     }
   }
 }

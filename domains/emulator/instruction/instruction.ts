@@ -3,10 +3,17 @@ import { Emulator } from '../emulator';
 export interface Instruction {
   execute(e: Emulator): void;
 }
-export type InstructionArg = {
-  type: string;
-  value: any;
-};
+
+export abstract class Instruction {
+  getLeftValue(e: Emulator, left: LeftInstructionArg): number {
+    switch (left.type) {
+      case InstructionArgType.CONSTANT:
+        return left.value;
+      case InstructionArgType.REGISTER:
+        return e.registers[left.value];
+    }
+  }
+}
 
 export enum InstructionType {
   MOVE,

@@ -5,23 +5,16 @@ import {
   RightInstructionArg,
 } from './instruction';
 import { Emulator } from '../emulator';
-export class AddInstruction implements Instruction {
+export class AddInstruction extends Instruction implements Instruction {
   left;
   right;
   constructor(left: LeftInstructionArg, right: RightInstructionArg) {
+    super();
     this.left = left;
     this.right = right;
   }
   execute(e: Emulator): void {
-    let newValue;
-    switch (this.left.type) {
-      case InstructionArgType.CONSTANT:
-        newValue = this.left.value;
-        break;
-      case InstructionArgType.REGISTER:
-        newValue = e.registers[this.left.value];
-        break;
-    }
+    const newValue = super.getLeftValue(e, this.left);
 
     if (this.right.type == InstructionArgType.REGISTER) {
       const target = this.right.value;
