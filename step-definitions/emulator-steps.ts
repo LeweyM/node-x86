@@ -21,6 +21,7 @@ Given('an emulator with the following instructions', async function (table: Tabl
   const instructionTypeByCode: Record<string, InstructionType> = {
     mov: InstructionType.MOVE,
     add: InstructionType.ADD,
+    sub: InstructionType.SUB,
   };
 
   table.rows().forEach((row) => {

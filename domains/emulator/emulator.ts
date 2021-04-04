@@ -3,7 +3,7 @@ import { Instruction } from './instruction/instruction';
 export class Emulator {
   registers: Record<string, number>;
   instructions: Instruction[];
-  instructionCounter = -1;
+  instructionCounter = 0;
   memory = new Array(100);
   constructor(instructions: Instruction[]) {
     this.registers = {
@@ -23,7 +23,7 @@ export class Emulator {
   }
 
   step(): void {
-    this.instructionCounter++;
     this.instructions[this.instructionCounter].execute(this);
+    this.instructionCounter++;
   }
 }

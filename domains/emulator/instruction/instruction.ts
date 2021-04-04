@@ -18,6 +18,7 @@ export abstract class Instruction {
 export enum InstructionType {
   MOVE,
   ADD,
+  SUB,
 }
 
 export type LeftInstructionArg = ConstantInstructionArg | RegisterInstructionArg;

@@ -7,6 +7,7 @@ import {
   RightInstructionArg,
 } from './instruction';
 import { MoveInstruction } from './moveInstruction';
+import { SubInstruction } from './subInstruction';
 
 export class InstructionFactory {
   static buildConstToRegister(
@@ -47,6 +48,8 @@ export class InstructionFactory {
         return new AddInstruction(lhs, rhs);
       case InstructionType.MOVE:
         return new MoveInstruction(lhs, rhs);
+      case InstructionType.SUB:
+        return new SubInstruction(lhs, rhs);
     }
   }
 }
