@@ -7,11 +7,11 @@ Feature: Emulator
 
   Scenario: executing an instruction set
     Given an emulator with the following instructions
-      | ins | lhs | rhs |
-      | mov | rax | 10  |
-      | mov | rbx | 5   |
-      | add | rax | 1   |
-      | add | rax | rbx |
+      | instruction | type        | lhs | rhs |
+      | mov         | constToReg  | 10  | rax |
+      | mov         | constToReg  | 5   | rbx |
+      | add         | constToReg  | 1   | rax |
+      | add         | regToReg    | rbx | rax |
     When emulator steps 4 times
     Then register rax should have value 16
     And register rbx should have value 5

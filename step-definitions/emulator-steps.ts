@@ -9,6 +9,10 @@ Given('register {word} is set to {int}', async function (reg: string, val: numbe
   this.emulator.setRegister(reg, val);
 });
 
+Given('memory {int} is set to {int}', async function (memAddress, val: number) {
+  this.emulator.setMemory(memAddress, val);
+});
+
 Given('an Emulator with no instructions', async function () {
   this.emulator = new Emulator([]);
 });
@@ -19,10 +23,41 @@ Given('an emulator with the following instructions', async function (table: Tabl
   table.rows().forEach((row) => {
     let instruction: Instruction;
     if (row[0] == 'mov') {
-      instruction = new MoveInstruction(row[1], row[2]);
+      switch (row[1]) {
+        case 'constToReg':
+          instruction = MoveInstruction.ConstToRegister(parseInt(row[2], 10), row[3]);
+          break;
+        case 'regToReg':
+          instruction = MoveInstruction.RegisterToRegister(row[2], row[3]);
+          break;
+        default:
+          throw new Error();
+      }
     } else if (row[0] == 'add') {
-      instruction = new AddInstruction(row[1], row[2]);
-    } else {
+      switch (row[1]) {
+        case 'constToReg':
+          instruction = AddInstruction.ConstToRegister(parseInt(row[2], 10), row[3]);
+          break;
+        case 'regToReg':
+          instruction = AddInstruction.RegisterToRegister(row[2], row[3]);
+          break;
+        default:
+          throw new Error();
+      }
+    }
+    // else if (row[0] == 'sub') {
+    //   switch (row[1]) {
+    //     case 'constToReg':
+    //       instruction = SubInstruction.ConstToRegister(parseInt(row[2], 10), row[3]);
+    //       break;
+    //     case 'regToReg':
+    //       instruction = SubInstruction.RegisterToRegister(row[2], row[3]);
+    //       break;
+    //     default:
+    //       throw new Error();
+    //   }
+    // }
+    else {
       throw new Error();
     }
     instructionSet.push(instruction);
@@ -41,12 +76,8 @@ When('emulator steps {int} times', async function (t: number) {
   }
 });
 
-Given('an emulator with add {word} {word} instruction', async function (r1, r2: string) {
-  this.emulator = new Emulator([new AddInstruction(r1, r2)]);
-});
-
-Given('an emulator with move {word} {word} instruction', async function (r1, r2: string) {
-  this.emulator = new Emulator([new MoveInstruction(r1, r2)]);
+Then('memory address {int} should have value {int}', async function (memAddress, value: number) {
+  expect(this.emulator.memory[memAddress]).toBe(value);
 });
 
 Then('register {word} should have value {int}', async function (reg: string, val: number) {
