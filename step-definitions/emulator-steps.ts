@@ -1,7 +1,6 @@
 import { Emulator } from '../domains/emulator/emulator';
-import { AddInstruction } from '../domains/emulator/instruction/addInstruction';
-import { MoveInstruction } from '../domains/emulator/instruction/moveInstruction';
-import { Instruction } from '../domains/emulator/instruction/instruction';
+import { Instruction, InstructionType } from '../domains/emulator/instruction/instruction';
+import { InstructionFactory } from '../domains/emulator/instruction/instructionFactory';
 import { Given, TableDefinition, Then, When } from 'cucumber';
 import expect from 'expect';
 
@@ -19,47 +18,32 @@ Given('an Emulator with no instructions', async function () {
 
 Given('an emulator with the following instructions', async function (table: TableDefinition) {
   const instructionSet: Instruction[] = [];
+  const instructionTypeByCode: Record<string, InstructionType> = {
+    mov: InstructionType.MOVE,
+    add: InstructionType.ADD,
+  };
 
   table.rows().forEach((row) => {
     let instruction: Instruction;
-    if (row[0] == 'mov') {
-      switch (row[1]) {
-        case 'constToReg':
-          instruction = MoveInstruction.ConstToRegister(parseInt(row[2], 10), row[3]);
-          break;
-        case 'regToReg':
-          instruction = MoveInstruction.RegisterToRegister(row[2], row[3]);
-          break;
-        default:
-          throw new Error();
-      }
-    } else if (row[0] == 'add') {
-      switch (row[1]) {
-        case 'constToReg':
-          instruction = AddInstruction.ConstToRegister(parseInt(row[2], 10), row[3]);
-          break;
-        case 'regToReg':
-          instruction = AddInstruction.RegisterToRegister(row[2], row[3]);
-          break;
-        default:
-          throw new Error();
-      }
+    switch (row[1]) {
+      case 'constToReg':
+        instruction = InstructionFactory.buildConstToRegister(
+          instructionTypeByCode[row[0]],
+          parseInt(row[2], 10),
+          row[3],
+        );
+        break;
+      case 'regToReg':
+        instruction = InstructionFactory.buildRegisterToRegister(
+          instructionTypeByCode[row[0]],
+          row[2],
+          row[3],
+        );
+        break;
+      default:
+        throw new Error();
     }
-    // else if (row[0] == 'sub') {
-    //   switch (row[1]) {
-    //     case 'constToReg':
-    //       instruction = SubInstruction.ConstToRegister(parseInt(row[2], 10), row[3]);
-    //       break;
-    //     case 'regToReg':
-    //       instruction = SubInstruction.RegisterToRegister(row[2], row[3]);
-    //       break;
-    //     default:
-    //       throw new Error();
-    //   }
-    // }
-    else {
-      throw new Error();
-    }
+
     instructionSet.push(instruction);
   });
 
