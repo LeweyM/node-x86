@@ -9,6 +9,7 @@ export class Emulator {
     this.registers = {
       rax: 0,
       rbx: 0,
+      eax: 0,
     };
     this.instructions = instructions;
     this.memory.fill(0);
@@ -25,5 +26,11 @@ export class Emulator {
   step(): void {
     this.instructions[this.instructionCounter].execute(this);
     this.instructionCounter++;
+  }
+
+  run(): void {
+    while (this.instructionCounter < this.instructions.length) {
+      this.step();
+    }
   }
 }

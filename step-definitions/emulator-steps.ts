@@ -41,6 +41,13 @@ Given('an emulator with the following instructions', async function (table: Tabl
           row[3],
         );
         break;
+      case 'constToPtr':
+        instruction = InstructionFactory.buildConstToPointer(
+          instructionTypeByCode[row[0]],
+          parseInt(row[2], 10),
+          row[3],
+        );
+        break;
       default:
         throw new Error();
     }
@@ -59,6 +66,10 @@ When('emulator steps {int} times', async function (t: number) {
   for (let i = 0; i < t; i++) {
     this.emulator.step();
   }
+});
+
+When('emulator has run', async function () {
+  this.emulator.run();
 });
 
 Then('memory address {int} should have value {int}', async function (memAddress, value: number) {

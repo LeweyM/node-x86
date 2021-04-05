@@ -12,6 +12,6 @@ Feature: Emulator
       | mov         | constToReg  | 5   | rbx |
       | add         | constToReg  | 1   | rax |
       | add         | regToReg    | rbx | rax |
-    When emulator steps 4 times
+    When emulator has run
     Then register rax should have value 16
     And register rbx should have value 5
