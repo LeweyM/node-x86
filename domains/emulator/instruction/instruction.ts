@@ -15,12 +15,17 @@ export abstract class Instruction {
   }
 }
 
-export enum InstructionType {
+export enum ArithmeticInstructionType {
   MOVE,
   ADD,
   SUB,
 }
 
+export enum InstructionType {
+  JUMP,
+}
+
+export type SingleInstructionArg = LabelInstructionArg;
 export type LeftInstructionArg = ConstantInstructionArg | RegisterInstructionArg;
 export type RightInstructionArg = RegisterInstructionArg | PointerInstructionArg;
 
@@ -38,8 +43,14 @@ export type PointerInstructionArg = {
   type: InstructionArgType.POINTER;
   value: string;
 };
+
+export type LabelInstructionArg = {
+  type: InstructionArgType.LABEL;
+  label: string;
+};
 export enum InstructionArgType {
   CONSTANT,
   REGISTER,
   POINTER,
+  LABEL,
 }

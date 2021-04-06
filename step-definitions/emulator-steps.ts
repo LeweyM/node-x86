@@ -1,6 +1,11 @@
 import { Emulator } from '../domains/emulator/emulator';
-import { Instruction, InstructionType } from '../domains/emulator/instruction/instruction';
+import {
+  Instruction,
+  ArithmeticInstructionType,
+  InstructionType,
+} from '../domains/emulator/instruction/instruction';
 import { InstructionFactory } from '../domains/emulator/instruction/instructionFactory';
+import { InstructionSet } from '../domains/emulator/instructionSet';
 import { Given, TableDefinition, Then, When } from 'cucumber';
 import expect from 'expect';
 
@@ -13,19 +18,30 @@ Given('memory {int} is set to {int}', async function (memAddress, val: number) {
 });
 
 Given('an Emulator with no instructions', async function () {
-  this.emulator = new Emulator([]);
+  this.emulator = new Emulator(new InstructionSet());
 });
 
 Given('an emulator with the following instructions', async function (table: TableDefinition) {
-  const instructionSet: Instruction[] = [];
-  const instructionTypeByCode: Record<string, InstructionType> = {
-    mov: InstructionType.MOVE,
-    add: InstructionType.ADD,
-    sub: InstructionType.SUB,
+  const instructionSet: InstructionSet = new InstructionSet();
+  const instructionTypeByCode: Record<string, ArithmeticInstructionType> = {
+    mov: ArithmeticInstructionType.MOVE,
+    add: ArithmeticInstructionType.ADD,
+    sub: ArithmeticInstructionType.SUB,
   };
 
   table.rows().forEach((row) => {
     let instruction: Instruction;
+
+    if (row[0] == 'label') {
+      instructionSet.addLabel(row[2]);
+      return;
+    }
+
+    if (row[0] == 'jmp') {
+      instructionSet.addInstruction(InstructionFactory.build(InstructionType.JUMP, row[2]));
+      return;
+    }
+
     switch (row[1]) {
       case 'constToReg':
         instruction = InstructionFactory.buildConstToRegister(
@@ -52,7 +68,7 @@ Given('an emulator with the following instructions', async function (table: Tabl
         throw new Error();
     }
 
-    instructionSet.push(instruction);
+    instructionSet.addInstruction(instruction);
   });
 
   this.emulator = new Emulator(instructionSet);

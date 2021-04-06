@@ -1,17 +1,17 @@
-import { Instruction } from './instruction/instruction';
+import { InstructionSet } from './instructionSet';
 
 export class Emulator {
   registers: Record<string, number>;
-  instructions: Instruction[];
+  instructionSet: InstructionSet;
   instructionCounter = 0;
   memory = new Array(100);
-  constructor(instructions: Instruction[]) {
+  constructor(instructionSet: InstructionSet) {
     this.registers = {
       rax: 0,
       rbx: 0,
       eax: 0,
     };
-    this.instructions = instructions;
+    this.instructionSet = instructionSet;
     this.memory.fill(0);
   }
 
@@ -24,12 +24,12 @@ export class Emulator {
   }
 
   step(): void {
-    this.instructions[this.instructionCounter].execute(this);
+    this.instructionSet.getInstruction(this.instructionCounter).execute(this);
     this.instructionCounter++;
   }
 
   run(): void {
-    while (this.instructionCounter < this.instructions.length) {
+    while (this.instructionSet.hasInstruction(this.instructionCounter)) {
       this.step();
     }
   }
