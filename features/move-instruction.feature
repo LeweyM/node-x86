@@ -19,3 +19,9 @@ Feature: Move Instructions
       And register rax is set to 11
       When emulator steps once
       Then memory address 11 should have value 4
+
+    Scenario: move instruction from constant to register with offset
+      Given an emulator with move const 4 to ptr rax instruction with offset of -4
+      And register rax is set to 10
+      When emulator steps once
+      Then memory address 6 should have value 4

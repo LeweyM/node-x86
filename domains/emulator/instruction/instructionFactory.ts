@@ -1,67 +1,82 @@
 import { AddInstruction } from './addInstruction';
-import {
-  Instruction,
-  InstructionArgType,
-  ArithmeticInstructionType,
-  LeftInstructionArg,
-  RightInstructionArg,
-  SingleInstructionArg,
-  InstructionType,
-} from './instruction';
+import * as instruction from './instruction';
 import { JumpInstruction } from './jumpInstruction';
-import { MoveInstruction } from './moveInstruction';
 import { SubInstruction } from './subInstruction';
 
 export class InstructionFactory {
-  static build(type: InstructionType, label: string): Instruction {
-    const arg: SingleInstructionArg = { type: InstructionArgType.LABEL, label: label };
+  static build(type: instruction.InstructionType, label: string): instruction.Instruction {
+    const arg: instruction.SingleInstructionArg = {
+      type: instruction.InstructionArgType.LABEL,
+      label: label,
+    };
     return InstructionFactory.createInstruction(type, arg);
   }
   static buildConstToRegister(
-    type: ArithmeticInstructionType,
+    type: instruction.ArithmeticInstructionType,
     constant: number,
     register: string,
-  ): Instruction {
-    const lhs: LeftInstructionArg = { type: InstructionArgType.CONSTANT, value: constant };
-    const rhs: RightInstructionArg = { type: InstructionArgType.REGISTER, value: register };
+  ): instruction.Instruction {
+    const lhs: instruction.LeftInstructionArg = {
+      type: instruction.InstructionArgType.CONSTANT,
+      value: constant,
+    };
+    const rhs: instruction.RightInstructionArg = {
+      type: instruction.InstructionArgType.REGISTER,
+      value: register,
+    };
     return InstructionFactory.createArithmeticInstruction(type, lhs, rhs);
   }
 
   static buildRegisterToRegister(
-    type: ArithmeticInstructionType,
+    type: instruction.ArithmeticInstructionType,
     register1: string,
     register2: string,
-  ): Instruction {
-    const lhs: LeftInstructionArg = { type: InstructionArgType.REGISTER, value: register1 };
-    const rhs: RightInstructionArg = { type: InstructionArgType.REGISTER, value: register2 };
+  ): instruction.Instruction {
+    const lhs: instruction.LeftInstructionArg = {
+      type: instruction.InstructionArgType.REGISTER,
+      value: register1,
+    };
+    const rhs: instruction.RightInstructionArg = {
+      type: instruction.InstructionArgType.REGISTER,
+      value: register2,
+    };
     return InstructionFactory.createArithmeticInstruction(type, lhs, rhs);
   }
   static buildConstToPointer(
-    type: ArithmeticInstructionType,
+    type: instruction.ArithmeticInstructionType,
     constant: number,
     pointer: string,
-  ): Instruction {
-    const lhs: LeftInstructionArg = { type: InstructionArgType.CONSTANT, value: constant };
-    const rhs: RightInstructionArg = { type: InstructionArgType.POINTER, value: pointer };
+  ): instruction.Instruction {
+    const lhs: instruction.LeftInstructionArg = {
+      type: instruction.InstructionArgType.CONSTANT,
+      value: constant,
+    };
+    const rhs: instruction.RightInstructionArg = {
+      type: instruction.InstructionArgType.POINTER,
+      value: pointer,
+    };
     return InstructionFactory.createArithmeticInstruction(type, lhs, rhs);
   }
   private static createArithmeticInstruction(
-    type: ArithmeticInstructionType,
-    lhs: LeftInstructionArg,
-    rhs: RightInstructionArg,
+    type: instruction.ArithmeticInstructionType,
+    lhs: instruction.LeftInstructionArg,
+    rhs: instruction.RightInstructionArg,
   ) {
     switch (type) {
-      case ArithmeticInstructionType.ADD:
+      case instruction.ArithmeticInstructionType.ADD:
         return new AddInstruction(lhs, rhs);
-      case ArithmeticInstructionType.MOVE:
-        return new MoveInstruction(lhs, rhs);
-      case ArithmeticInstructionType.SUB:
+      case instruction.ArithmeticInstructionType.MOVE:
+        throw new Error('move should not use the factory. workaround!');
+      case instruction.ArithmeticInstructionType.SUB:
         return new SubInstruction(lhs, rhs);
     }
   }
-  private static createInstruction(type: InstructionType, lhs: SingleInstructionArg) {
+  private static createInstruction(
+    type: instruction.InstructionType,
+    lhs: instruction.SingleInstructionArg,
+  ) {
     switch (type) {
-      case InstructionType.JUMP:
+      case instruction.InstructionType.JUMP:
         return new JumpInstruction(lhs);
     }
   }

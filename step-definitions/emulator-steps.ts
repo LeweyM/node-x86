@@ -6,6 +6,12 @@ import {
 } from '../domains/emulator/instruction/instruction';
 import { InstructionFactory } from '../domains/emulator/instruction/instructionFactory';
 import { InstructionSet } from '../domains/emulator/instructionSet';
+import { MoveInstruction } from '../domains/emulator/instruction/moveInstruction';
+import {
+  ImmediateSource,
+  RegisterSource,
+  RegisterTarget,
+} from '../domains/emulator/instruction/source';
 import { Given, TableDefinition, Then, When } from 'cucumber';
 import expect from 'expect';
 
@@ -39,6 +45,11 @@ Given('an emulator with the following instructions', async function (table: Tabl
 
     if (row[0] == 'jmp') {
       instructionSet.addInstruction(InstructionFactory.build(InstructionType.JUMP, row[2]));
+      return;
+    }
+
+    if (row[0] == 'mov') {
+      instructionSet.addInstruction(new MoveInstruction(getSource(row), getTarget(row)));
       return;
     }
 
@@ -101,3 +112,29 @@ Then('all registers should have a value of {int}', async function (val: number) 
     expect(this.emulator.registers[reg]).toBe(val);
   });
 });
+
+function getSource(row: string[]) {
+  switch (row[1]) {
+    case 'constToReg':
+      return new ImmediateSource(parseInt(row[2], 10));
+    case 'regToReg':
+      return new RegisterSource(row[2]);
+    case 'constToPtr':
+      return new ImmediateSource(parseInt(row[2], 10));
+    default:
+      throw new Error();
+  }
+}
+
+function getTarget(row: string[]) {
+  switch (row[1]) {
+    case 'constToReg':
+      return new RegisterTarget(row[3]);
+    case 'regToReg':
+      return new RegisterTarget(row[3]);
+    case 'constToPtr':
+      return new RegisterTarget(row[3], true, 0);
+    default:
+      throw new Error();
+  }
+}
