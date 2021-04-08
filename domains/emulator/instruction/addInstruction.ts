@@ -1,28 +1,19 @@
-import {
-  Instruction,
-  InstructionArgType,
-  LeftInstructionArg,
-  RightInstructionArg,
-} from './instruction';
+import { Instruction } from './instruction';
+import { MemReader, MemWriter } from '../source';
 import { Emulator } from '../emulator';
-export class AddInstruction extends Instruction {
+export class AddInstruction implements Instruction {
   left;
   right;
-  constructor(left: LeftInstructionArg, right: RightInstructionArg) {
-    super();
+  e: Emulator;
+  constructor(e: Emulator, left: MemReader, right: MemReader & MemWriter) {
+    this.e = e;
     this.left = left;
     this.right = right;
   }
-  execute(e: Emulator): void {
-    const newValue = super.getLeftValue(e, this.left);
+  execute(): void {
+    const leftValue = this.left.read(this.e);
+    const rightValue = this.right.read(this.e);
 
-    if (this.right.type == InstructionArgType.REGISTER) {
-      const target = this.right.value;
-      e.setRegister(target, e.registers[target] + newValue);
-    }
-    if (this.right.type == InstructionArgType.POINTER) {
-      const memAddress = e.registers[this.right.value];
-      e.setMemory(memAddress, e.memory[memAddress] + newValue);
-    }
+    this.right.write(this.e, rightValue + leftValue);
   }
 }

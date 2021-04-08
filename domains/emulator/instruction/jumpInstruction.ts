@@ -1,15 +1,15 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { Instruction, LabelInstructionArg } from './instruction';
+import { Instruction } from './instruction';
 import { Emulator } from '../emulator';
-export class JumpInstruction extends Instruction {
-  left;
-  constructor(left: LabelInstructionArg) {
-    super();
-    this.left = left;
+export class JumpInstruction implements Instruction {
+  label;
+  e: Emulator;
+  constructor(e: Emulator, label: string) {
+    this.e = e;
+    this.label = label;
   }
 
-  execute(e: Emulator): void {
-    const nextInstruction = e.instructionSet.getInstructionLocationFromLabel(this.left.label);
-    e.instructionCounter = nextInstruction - 1;
+  execute(): void {
+    const nextInstruction = this.e.instructionSet.getInstructionLocationFromLabel(this.label);
+    this.e.instructionCounter = nextInstruction - 1;
   }
 }

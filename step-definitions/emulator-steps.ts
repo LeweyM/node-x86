@@ -1,17 +1,10 @@
 import { Emulator } from '../domains/emulator/emulator';
-import {
-  Instruction,
-  ArithmeticInstructionType,
-  InstructionType,
-} from '../domains/emulator/instruction/instruction';
-import { InstructionFactory } from '../domains/emulator/instruction/instructionFactory';
 import { InstructionSet } from '../domains/emulator/instructionSet';
 import { MoveInstruction } from '../domains/emulator/instruction/moveInstruction';
-import {
-  ImmediateSource,
-  RegisterSource,
-  RegisterTarget,
-} from '../domains/emulator/instruction/source';
+import { ImmediateSource, RegisterSource, RegisterTarget } from '../domains/emulator/source';
+import { AddInstruction } from '../domains/emulator/instruction/addInstruction';
+import { SubInstruction } from '../domains/emulator/instruction/subInstruction';
+import { JumpInstruction } from '../domains/emulator/instruction/jumpInstruction';
 import { Given, TableDefinition, Then, When } from 'cucumber';
 import expect from 'expect';
 
@@ -29,60 +22,40 @@ Given('an Emulator with no instructions', async function () {
 
 Given('an emulator with the following instructions', async function (table: TableDefinition) {
   const instructionSet: InstructionSet = new InstructionSet();
-  const instructionTypeByCode: Record<string, ArithmeticInstructionType> = {
-    mov: ArithmeticInstructionType.MOVE,
-    add: ArithmeticInstructionType.ADD,
-    sub: ArithmeticInstructionType.SUB,
-  };
+  this.emulator = new Emulator(instructionSet);
 
   table.rows().forEach((row) => {
-    let instruction: Instruction;
-
     if (row[0] == 'label') {
       instructionSet.addLabel(row[2]);
       return;
     }
 
     if (row[0] == 'jmp') {
-      instructionSet.addInstruction(InstructionFactory.build(InstructionType.JUMP, row[2]));
+      instructionSet.addInstruction(new JumpInstruction(this.emulator, row[2]));
       return;
     }
 
     if (row[0] == 'mov') {
-      instructionSet.addInstruction(new MoveInstruction(getSource(row), getTarget(row)));
+      instructionSet.addInstruction(
+        new MoveInstruction(this.emulator, getSource(row), getTarget(row)),
+      );
       return;
     }
 
-    switch (row[1]) {
-      case 'constToReg':
-        instruction = InstructionFactory.buildConstToRegister(
-          instructionTypeByCode[row[0]],
-          parseInt(row[2], 10),
-          row[3],
-        );
-        break;
-      case 'regToReg':
-        instruction = InstructionFactory.buildRegisterToRegister(
-          instructionTypeByCode[row[0]],
-          row[2],
-          row[3],
-        );
-        break;
-      case 'constToPtr':
-        instruction = InstructionFactory.buildConstToPointer(
-          instructionTypeByCode[row[0]],
-          parseInt(row[2], 10),
-          row[3],
-        );
-        break;
-      default:
-        throw new Error();
+    if (row[0] == 'add') {
+      instructionSet.addInstruction(
+        new AddInstruction(this.emulator, getSource(row), getTarget(row)),
+      );
+      return;
     }
 
-    instructionSet.addInstruction(instruction);
+    if (row[0] == 'sub') {
+      instructionSet.addInstruction(
+        new SubInstruction(this.emulator, getSource(row), getTarget(row)),
+      );
+      return;
+    }
   });
-
-  this.emulator = new Emulator(instructionSet);
 });
 
 When('emulator steps once', async function () {

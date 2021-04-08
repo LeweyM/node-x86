@@ -24,7 +24,7 @@ export class Emulator {
   }
 
   step(): void {
-    this.instructionSet.getInstruction(this.instructionCounter).execute(this);
+    this.instructionSet.getInstruction(this.instructionCounter).execute();
     this.instructionCounter++;
   }
 
