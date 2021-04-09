@@ -6,6 +6,7 @@ export interface MemReader {
 
 export interface MemWriter {
   write(e: Emulator, val: number): void;
+  address(e: Emulator): number; //todo: should be in reader interface
 }
 
 export class ImmediateSource implements MemReader {
@@ -41,21 +42,27 @@ export class RegisterAccessor implements MemReader, MemWriter {
   }
   write(e: Emulator, value: number): void {
     if (this.isPointer) {
-      const valueAtBaseRegister = e.registers[this.baseRegister];
-      const valueAtIndexRegister = e.registers[this.indexRegister] || 0;
-      e.memory[valueAtBaseRegister + valueAtIndexRegister * this.scale + this.offset] = value;
+      e.memory[this.getAddress(e)] = value;
     } else {
       e.registers[this.baseRegister] = value;
     }
   }
 
+  address(e: Emulator): number {
+    return this.getAddress(e);
+  }
+
   read(e: Emulator): number {
     if (this.isPointer) {
-      const valueAtBaseRegister = e.registers[this.baseRegister];
-      const valueAtIndexRegister = e.registers[this.indexRegister] || 0;
-      return e.memory[valueAtBaseRegister + valueAtIndexRegister * this.scale + this.offset];
+      return e.memory[this.getAddress(e)];
     } else {
       return e.registers[this.baseRegister];
     }
+  }
+
+  private getAddress(e: Emulator) {
+    const valueAtBaseRegister = e.registers[this.baseRegister];
+    const valueAtIndexRegister = e.registers[this.indexRegister] || 0;
+    return valueAtBaseRegister + valueAtIndexRegister * this.scale + this.offset;
   }
 }

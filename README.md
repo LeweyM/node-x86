@@ -3,4 +3,4 @@
 ## TODO
 
 * ~~Scaled indexing~~
-* leaq instruction
+* ~~leaq instruction~~
