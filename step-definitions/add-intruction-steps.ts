@@ -1,7 +1,7 @@
 import { Emulator } from '../domains/emulator/emulator';
 import { InstructionSet } from '../domains/emulator/instructionSet';
 import { AddInstruction } from '../domains/emulator/instruction/addInstruction';
-import { ImmediateSource, RegisterSource, RegisterTarget } from '../domains/emulator/source';
+import { ImmediateSource, RegisterAccessor } from '../domains/emulator/memoryAccessors';
 import { Given } from 'cucumber';
 
 Given(
@@ -11,8 +11,8 @@ Given(
     this.emulator = new Emulator(instructionSet);
     const instruction = new AddInstruction(
       this.emulator,
-      new RegisterSource(r1),
-      new RegisterTarget(r2),
+      new RegisterAccessor(r1),
+      new RegisterAccessor(r2),
     );
     instructionSet.addInstruction(instruction);
   },
@@ -26,7 +26,7 @@ Given(
     const instruction = new AddInstruction(
       this.emulator,
       new ImmediateSource(constant),
-      new RegisterTarget(register),
+      new RegisterAccessor(register),
     );
     instructionSet.addInstruction(instruction);
   },
@@ -40,7 +40,7 @@ Given(
     const instruction = new AddInstruction(
       this.emulator,
       new ImmediateSource(constant),
-      new RegisterTarget(register, true),
+      new RegisterAccessor(register, true),
     );
     instructionSet.addInstruction(instruction);
   },

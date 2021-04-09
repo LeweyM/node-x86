@@ -1,5 +1,5 @@
 import { Instruction } from './instruction';
-import { MemReader, MemWriter } from '../source';
+import { MemReader, MemWriter } from '../memoryAccessors';
 import { Emulator } from '../emulator';
 export class AddInstruction implements Instruction {
   left;

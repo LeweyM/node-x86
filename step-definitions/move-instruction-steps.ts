@@ -1,7 +1,7 @@
 import { Emulator } from '../domains/emulator/emulator';
 import { InstructionSet } from '../domains/emulator/instructionSet';
 import { MoveInstruction } from '../domains/emulator/instruction/moveInstruction';
-import { ImmediateSource, RegisterSource, RegisterTarget } from '../domains/emulator/source';
+import { ImmediateSource, RegisterAccessor } from '../domains/emulator/memoryAccessors';
 import { Given } from 'cucumber';
 
 Given(
@@ -12,7 +12,7 @@ Given(
     const instruction = new MoveInstruction(
       this.emulator,
       new ImmediateSource(constant),
-      new RegisterTarget(register),
+      new RegisterAccessor(register),
     );
     instructionSet.addInstruction(instruction);
   },
@@ -23,8 +23,8 @@ Given('an emulator with move {word} to {word} instruction', async function (r1, 
   this.emulator = new Emulator(instructionSet);
   const instruction = new MoveInstruction(
     this.emulator,
-    new RegisterSource(r1),
-    new RegisterTarget(r2),
+    new RegisterAccessor(r1),
+    new RegisterAccessor(r2),
   );
   instructionSet.addInstruction(instruction);
 });
@@ -37,7 +37,7 @@ Given(
     const instruction = new MoveInstruction(
       this.emulator,
       new ImmediateSource(constant),
-      new RegisterTarget(register, true, offset),
+      new RegisterAccessor(register, true, offset),
     );
     instructionSet.addInstruction(instruction);
   },
@@ -51,7 +51,7 @@ Given(
     const instruction = new MoveInstruction(
       this.emulator,
       new ImmediateSource(constant),
-      new RegisterTarget(register, true, 0),
+      new RegisterAccessor(register, true, 0),
     );
     instructionSet.addInstruction(instruction);
   },
