@@ -1,5 +1,5 @@
 import { Emulator } from './emulator';
-import { RegisterId } from './registerTypes';
+import { RegisterId } from './registers/registerConfig';
 
 export interface MemReader {
   read(e: Emulator): bigint;

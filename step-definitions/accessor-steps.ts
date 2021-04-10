@@ -1,5 +1,5 @@
 import { RegisterAccessor } from '../domains/emulator/memoryAccessors';
-import { RegisterId } from '../domains/emulator/registerTypes';
+import { RegisterId } from '../domains/emulator/registers/registerConfig';
 import { Given, TableDefinition, Then, When } from 'cucumber';
 import expect from 'expect';
 

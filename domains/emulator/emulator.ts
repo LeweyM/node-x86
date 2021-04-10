@@ -1,6 +1,6 @@
 import { InstructionSet } from './instructionSet';
-import { Registers } from './registers';
-import { RegisterId } from './registerTypes';
+import { Registers } from './registers/registers';
+import { RegisterId } from './registers/registerConfig';
 
 export class Emulator {
   registers: Registers;

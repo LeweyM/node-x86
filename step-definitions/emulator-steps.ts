@@ -5,7 +5,7 @@ import { ImmediateSource, RegisterAccessor } from '../domains/emulator/memoryAcc
 import { AddInstruction } from '../domains/emulator/instruction/addInstruction';
 import { SubInstruction } from '../domains/emulator/instruction/subInstruction';
 import { JumpInstruction } from '../domains/emulator/instruction/jumpInstruction';
-import { RegisterId } from '../domains/emulator/registerTypes';
+import { RegisterId } from '../domains/emulator/registers/registerConfig';
 import { Given, TableDefinition, Then, When } from 'cucumber';
 import expect from 'expect';
 

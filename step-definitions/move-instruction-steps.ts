@@ -2,7 +2,7 @@ import { Emulator } from '../domains/emulator/emulator';
 import { InstructionSet } from '../domains/emulator/instructionSet';
 import { MoveInstruction } from '../domains/emulator/instruction/moveInstruction';
 import { ImmediateSource, RegisterAccessor } from '../domains/emulator/memoryAccessors';
-import { RegisterId } from '../domains/emulator/registerTypes';
+import { RegisterId } from '../domains/emulator/registers/registerConfig';
 import { Given } from 'cucumber';
 
 Given(
