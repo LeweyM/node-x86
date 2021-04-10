@@ -53,7 +53,7 @@ Feature: Accessor
     Then memory address 6 should have value 11
     And the accessor should read 11
 
-  Scenario: quad register accessor 
+  Scenario: 64bit quad register accessor 
     Given an Emulator with no instructions
     And register rax is set to 0
     And a register accessor with the following parameters
@@ -63,7 +63,7 @@ Feature: Accessor
     Then register rax should have value hex: 0011223344556677
     And the accessor should read hex: 0011223344556677
 
-  Scenario: byte register accessor
+  Scenario: 8bit byte register accessor
     Given an Emulator with no instructions
     And register rax is set to hex: 0011223344556677
     And a register accessor with the following parameters
@@ -73,7 +73,7 @@ Feature: Accessor
     Then register rax should have value hex: 00112233445566FF
     And the accessor should read hex: FF
 
-  Scenario: word register accessor
+  Scenario: 16bit word register accessor
     Given an Emulator with no instructions
     And register rax is set to hex: 0011223344556677
     And a register accessor with the following parameters
@@ -83,12 +83,12 @@ Feature: Accessor
     Then register rax should have value hex: 001122334455FFFF
     And the accessor should read hex: FFFF
 
-  Scenario: word register accessor
+  Scenario: 32bit double register accessor
     Given an Emulator with no instructions
     And register rax is set to hex: 0011223344556677
     And a register accessor with the following parameters
       | register  | isPointer | offset | scale | indexReg |
       | eax       | false     | 0      | 1     |          |
     When the accessor writes hex: FFFFFFFF
-    Then register rax should have value hex: 00112233FFFFFFFF
+    Then register rax should have value hex: 00000000FFFFFFFF
     And the accessor should read hex: FFFFFFFF

@@ -28,8 +28,13 @@ export class Registers {
   write(registerName: RegisterId, value: bigint): void {
     const register = this.registers[registerName];
     const originalValue = this.registerData[register.registerIndex];
-    const overwrittenValue = this.overwriteEndBits(register.size, originalValue, value);
-    this.registerData[register.registerIndex] = overwrittenValue;
+    // 32 and 64 bit instructions zero out higher order bits
+    if (register.size >= 32) {
+      this.registerData[register.registerIndex] = value;
+    } else {
+      const overwrittenValue = this.overwriteEndBits(register.size, originalValue, value);
+      this.registerData[register.registerIndex] = overwrittenValue;
+    }
   }
 
   private endBits(bytes: number, value: bigint) {
