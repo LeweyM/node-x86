@@ -1,25 +1,25 @@
 import { InstructionSet } from './instructionSet';
 
 export class Emulator {
-  registers: Record<string, number>;
+  registers: Record<string, bigint>;
   instructionSet: InstructionSet;
   instructionCounter = 0;
-  memory = new Array(100);
+  memory: bigint[] = new Array(100);
   constructor(instructionSet: InstructionSet) {
     this.registers = {
-      rax: 0,
-      rbx: 0,
-      eax: 0,
+      rax: BigInt(0),
+      rbx: BigInt(0),
+      eax: BigInt(0),
     };
     this.instructionSet = instructionSet;
-    this.memory.fill(0);
+    this.memory.fill(BigInt(0));
   }
 
-  setRegister(reg: string, val: number): void {
+  setRegister(reg: string, val: bigint): void {
     this.registers[reg] = val;
   }
 
-  setMemory(address: number, val: number): void {
+  setMemory(address: number, val: bigint): void {
     this.memory[address] = val;
   }
 

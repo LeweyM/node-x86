@@ -13,12 +13,19 @@ Given('a register accessor with the following parameters', async function (table
     );
   });
 });
-
 When('the accessor writes {int}', async function (value: number) {
+  this.registerAccessor.write(this.emulator, BigInt(value));
+});
+When('the accessor writes hex: {word}', async function (hexValue: string) {
+  const value = BigInt('0x' + hexValue);
   this.registerAccessor.write(this.emulator, value);
 });
 
 Then('the accessor should read {int}', async function (value: number) {
+  expect(this.registerAccessor.read(this.emulator)).toBe(BigInt(value));
+});
+Then('the accessor should read hex: {word}', async function (hexValue: string) {
+  const value = BigInt('0x' + hexValue);
   expect(this.registerAccessor.read(this.emulator)).toBe(value);
 });
 

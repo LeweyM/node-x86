@@ -1,20 +1,20 @@
 import { Emulator } from './emulator';
 
 export interface MemReader {
-  read(e: Emulator): number;
+  read(e: Emulator): bigint;
 }
 
 export interface MemWriter {
-  write(e: Emulator, val: number): void;
-  address(e: Emulator): number; //todo: should be in reader interface
+  write(e: Emulator, val: bigint): void;
+  address(e: Emulator): bigint; //todo: should be in reader interface
 }
 
 export class ImmediateSource implements MemReader {
-  val: number;
-  constructor(value: number) {
+  val: bigint;
+  constructor(value: bigint) {
     this.val = value;
   }
-  read(_e: Emulator): number {
+  read(_e: Emulator): bigint {
     return this.val;
   }
 }
@@ -40,21 +40,21 @@ export class RegisterAccessor implements MemReader, MemWriter {
     this.isPointer = isPointer;
     this.scale = scale;
   }
-  write(e: Emulator, value: number): void {
+  write(e: Emulator, value: bigint): void {
     if (this.isPointer) {
-      e.memory[this.getAddress(e)] = value;
+      e.memory[Number(this.getAddress(e))] = value;
     } else {
       e.registers[this.baseRegister] = value;
     }
   }
 
-  address(e: Emulator): number {
+  address(e: Emulator): bigint {
     return this.getAddress(e);
   }
 
-  read(e: Emulator): number {
+  read(e: Emulator): bigint {
     if (this.isPointer) {
-      return e.memory[this.getAddress(e)];
+      return e.memory[Number(this.getAddress(e))];
     } else {
       return e.registers[this.baseRegister];
     }
@@ -62,7 +62,7 @@ export class RegisterAccessor implements MemReader, MemWriter {
 
   private getAddress(e: Emulator) {
     const valueAtBaseRegister = e.registers[this.baseRegister];
-    const valueAtIndexRegister = e.registers[this.indexRegister] || 0;
-    return valueAtBaseRegister + valueAtIndexRegister * this.scale + this.offset;
+    const valueAtIndexRegister = e.registers[this.indexRegister] || BigInt(0);
+    return valueAtBaseRegister + valueAtIndexRegister * BigInt(this.scale) + BigInt(this.offset);
   }
 }

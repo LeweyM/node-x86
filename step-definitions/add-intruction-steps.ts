@@ -25,7 +25,7 @@ Given(
     this.emulator = new Emulator(instructionSet);
     const instruction = new AddInstruction(
       this.emulator,
-      new ImmediateSource(constant),
+      new ImmediateSource(BigInt(constant)),
       new RegisterAccessor(register),
     );
     instructionSet.addInstruction(instruction);
@@ -39,7 +39,7 @@ Given(
     this.emulator = new Emulator(instructionSet);
     const instruction = new AddInstruction(
       this.emulator,
-      new ImmediateSource(constant),
+      new ImmediateSource(BigInt(constant)),
       new RegisterAccessor(register, true),
     );
     instructionSet.addInstruction(instruction);

@@ -1,3 +1,4 @@
+@only
 Feature: Move Instructions
     Move instruction
 

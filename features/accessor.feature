@@ -52,3 +52,23 @@ Feature: Accessor
     When the accessor writes 11
     Then memory address 6 should have value 11
     And the accessor should read 11
+
+  Scenario: quad register accessor 
+    Given an Emulator with no instructions
+    And register rax is set to 0
+    And a register accessor with the following parameters
+      | register | isPointer | offset | scale | indexReg |
+      | rax      | false     | 0      | 1     |          |
+    When the accessor writes hex: 0011223344556677
+    Then register rax should have value hex: 0011223344556677
+    And the accessor should read hex: 0011223344556677
+
+  # Scenario: byte register accessor
+  #   Given an Emulator with no instructions
+  #   And register rax is set to hex: 0011223344556677
+  #   And a register accessor with the following parameters
+  #     | register | isPointer | offset | scale | indexReg |
+  #     | al       | false     | 0      | 1     |          |
+  #   When the accessor writes -1 
+  #   Then register rax should have value hex: 00112233445566FF
+  #   And the accessor should read hex: FF

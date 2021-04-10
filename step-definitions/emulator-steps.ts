@@ -9,11 +9,15 @@ import { Given, TableDefinition, Then, When } from 'cucumber';
 import expect from 'expect';
 
 Given('register {word} is set to {int}', async function (reg: string, val: number) {
-  this.emulator.setRegister(reg, val);
+  this.emulator.setRegister(reg, BigInt(val));
+});
+Given('register {word} is set to hex: {word}', async function (reg: string, hexValue: string) {
+  const value = BigInt('0x' + hexValue);
+  this.emulator.setRegister(reg, value);
 });
 
 Given('memory {int} is set to {int}', async function (memAddress, val: number) {
-  this.emulator.setMemory(memAddress, val);
+  this.emulator.setMemory(memAddress, BigInt(val));
 });
 
 Given('an Emulator with no instructions', async function () {
@@ -63,27 +67,34 @@ When('emulator has run', async function () {
 });
 
 Then('memory address {int} should have value {int}', async function (memAddress, value: number) {
-  expect(this.emulator.memory[memAddress]).toBe(value);
+  expect(this.emulator.memory[memAddress]).toEqual(BigInt(value));
 });
 
 Then('register {word} should have value {int}', async function (reg: string, val: number) {
-  expect(this.emulator.registers[reg]).toBe(val);
+  expect(this.emulator.registers[reg]).toEqual(BigInt(val));
 });
+Then(
+  'register {word} should have value hex: {word}',
+  async function (reg: string, hexValue: string) {
+    const value = BigInt('0x' + hexValue);
+    expect(this.emulator.registers[reg]).toBe(value);
+  },
+);
 
-Then('all registers should have a value of {int}', async function (val: number) {
+Then('all registers should have a value of {int}', async function (val: bigint) {
   Object.keys(this.emulator.registers).forEach((reg) => {
-    expect(this.emulator.registers[reg]).toBe(val);
+    expect(this.emulator.registers[reg]).toBe(BigInt(val));
   });
 });
 
 function getSource(row: string[]) {
   switch (row[1]) {
     case 'constToReg':
-      return new ImmediateSource(parseInt(row[2], 10));
+      return new ImmediateSource(BigInt(row[2]));
     case 'regToReg':
       return new RegisterAccessor(row[2]);
     case 'constToPtr':
-      return new ImmediateSource(parseInt(row[2], 10));
+      return new ImmediateSource(BigInt(row[2]));
     default:
       throw new Error();
   }
