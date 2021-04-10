@@ -2,6 +2,7 @@ import { Emulator } from '../domains/emulator/emulator';
 import { LoadAddressInstruction } from '../domains/emulator/instruction/loadAddressInstruction';
 import { InstructionSet } from '../domains/emulator/instructionSet';
 import { RegisterAccessor } from '../domains/emulator/memoryAccessors';
+import { RegisterId } from '../domains/emulator/registerTypes';
 import { Given } from 'cucumber';
 
 Given(
@@ -17,8 +18,14 @@ Given(
     this.emulator = new Emulator(instructionSet);
     const instruction = new LoadAddressInstruction(
       this.emulator,
-      new RegisterAccessor(leftBaseReg, true, leftOffset, leftScale as 1 | 2 | 4 | 8, leftIndexReg),
-      new RegisterAccessor(rightReg),
+      new RegisterAccessor(
+        leftBaseReg as RegisterId,
+        true,
+        leftOffset,
+        leftScale as 1 | 2 | 4 | 8,
+        leftIndexReg as RegisterId,
+      ),
+      new RegisterAccessor(rightReg as RegisterId),
     );
     instructionSet.addInstruction(instruction);
   },

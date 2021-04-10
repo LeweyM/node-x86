@@ -5,6 +5,7 @@ import { ImmediateSource, RegisterAccessor } from '../domains/emulator/memoryAcc
 import { AddInstruction } from '../domains/emulator/instruction/addInstruction';
 import { SubInstruction } from '../domains/emulator/instruction/subInstruction';
 import { JumpInstruction } from '../domains/emulator/instruction/jumpInstruction';
+import { RegisterId } from '../domains/emulator/registerTypes';
 import { Given, TableDefinition, Then, When } from 'cucumber';
 import expect from 'expect';
 
@@ -71,19 +72,19 @@ Then('memory address {int} should have value {int}', async function (memAddress,
 });
 
 Then('register {word} should have value {int}', async function (reg: string, val: number) {
-  expect(this.emulator.registers[reg]).toEqual(BigInt(val));
+  expect(this.emulator.registers.read(reg)).toEqual(BigInt(val));
 });
 Then(
   'register {word} should have value hex: {word}',
   async function (reg: string, hexValue: string) {
     const value = BigInt('0x' + hexValue);
-    expect(this.emulator.registers[reg]).toBe(value);
+    expect(this.emulator.registers.read(reg)).toBe(value);
   },
 );
 
 Then('all registers should have a value of {int}', async function (val: bigint) {
   Object.keys(this.emulator.registers).forEach((reg) => {
-    expect(this.emulator.registers[reg]).toBe(BigInt(val));
+    expect(this.emulator.registers.read(reg)).toBe(BigInt(val));
   });
 });
 
@@ -92,7 +93,7 @@ function getSource(row: string[]) {
     case 'constToReg':
       return new ImmediateSource(BigInt(row[2]));
     case 'regToReg':
-      return new RegisterAccessor(row[2]);
+      return new RegisterAccessor(row[2] as RegisterId);
     case 'constToPtr':
       return new ImmediateSource(BigInt(row[2]));
     default:
@@ -103,11 +104,11 @@ function getSource(row: string[]) {
 function getTarget(row: string[]) {
   switch (row[1]) {
     case 'constToReg':
-      return new RegisterAccessor(row[3]);
+      return new RegisterAccessor(row[3] as RegisterId);
     case 'regToReg':
-      return new RegisterAccessor(row[3]);
+      return new RegisterAccessor(row[3] as RegisterId);
     case 'constToPtr':
-      return new RegisterAccessor(row[3], true, 0);
+      return new RegisterAccessor(row[3] as RegisterId, true, 0);
     default:
       throw new Error();
   }

@@ -2,6 +2,7 @@ import { Emulator } from '../domains/emulator/emulator';
 import { InstructionSet } from '../domains/emulator/instructionSet';
 import { MoveInstruction } from '../domains/emulator/instruction/moveInstruction';
 import { ImmediateSource, RegisterAccessor } from '../domains/emulator/memoryAccessors';
+import { RegisterId } from '../domains/emulator/registerTypes';
 import { Given } from 'cucumber';
 
 Given(
@@ -12,7 +13,7 @@ Given(
     const instruction = new MoveInstruction(
       this.emulator,
       new ImmediateSource(BigInt(constant)),
-      new RegisterAccessor(register),
+      new RegisterAccessor(register as RegisterId),
     );
     instructionSet.addInstruction(instruction);
   },
@@ -23,8 +24,8 @@ Given('an emulator with move {word} to {word} instruction', async function (r1, 
   this.emulator = new Emulator(instructionSet);
   const instruction = new MoveInstruction(
     this.emulator,
-    new RegisterAccessor(r1),
-    new RegisterAccessor(r2),
+    new RegisterAccessor(r1 as RegisterId),
+    new RegisterAccessor(r2 as RegisterId),
   );
   instructionSet.addInstruction(instruction);
 });
@@ -37,7 +38,7 @@ Given(
     const instruction = new MoveInstruction(
       this.emulator,
       new ImmediateSource(BigInt(constant)),
-      new RegisterAccessor(register, true, offset),
+      new RegisterAccessor(register as RegisterId, true, offset),
     );
     instructionSet.addInstruction(instruction);
   },
@@ -51,7 +52,7 @@ Given(
     const instruction = new MoveInstruction(
       this.emulator,
       new ImmediateSource(BigInt(constant)),
-      new RegisterAccessor(register, true, 0),
+      new RegisterAccessor(register as RegisterId, true, 0),
     );
     instructionSet.addInstruction(instruction);
   },

@@ -6,4 +6,4 @@
 * ~~leaq instruction~~
 * push to stack
 * pop to stack
-* saving to different bytes of same registers
+* ~~saving to different bytes of same registers~~

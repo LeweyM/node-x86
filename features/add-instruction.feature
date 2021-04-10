@@ -1,10 +1,6 @@
 Feature: Add Instructions
     Add instructions
 
-    Scenario: initial conditions
-      Given an Emulator with no instructions
-      Then all registers should have a value of 0
-
     Scenario: add instruction from constant to register
       Given an emulator with add const 5 to register rax instruction
       And register rax is set to 3

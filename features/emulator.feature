@@ -1,10 +1,6 @@
 Feature: Emulator
   The x86 Emulator
 
-  Scenario: initial conditions
-    Given an Emulator with no instructions
-    Then all registers should have a value of 0
-
   Scenario: executing an instruction set
     Given an emulator with the following instructions
       | instruction | type        | lhs | rhs |

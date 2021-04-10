@@ -63,12 +63,32 @@ Feature: Accessor
     Then register rax should have value hex: 0011223344556677
     And the accessor should read hex: 0011223344556677
 
-  # Scenario: byte register accessor
-  #   Given an Emulator with no instructions
-  #   And register rax is set to hex: 0011223344556677
-  #   And a register accessor with the following parameters
-  #     | register | isPointer | offset | scale | indexReg |
-  #     | al       | false     | 0      | 1     |          |
-  #   When the accessor writes -1 
-  #   Then register rax should have value hex: 00112233445566FF
-  #   And the accessor should read hex: FF
+  Scenario: byte register accessor
+    Given an Emulator with no instructions
+    And register rax is set to hex: 0011223344556677
+    And a register accessor with the following parameters
+      | register | isPointer | offset | scale | indexReg |
+      | al       | false     | 0      | 1     |          |
+    When the accessor writes hex: FF 
+    Then register rax should have value hex: 00112233445566FF
+    And the accessor should read hex: FF
+
+  Scenario: word register accessor
+    Given an Emulator with no instructions
+    And register rax is set to hex: 0011223344556677
+    And a register accessor with the following parameters
+      | register | isPointer | offset | scale | indexReg |
+      | ax       | false     | 0      | 1     |          |
+    When the accessor writes hex: FFFF 
+    Then register rax should have value hex: 001122334455FFFF
+    And the accessor should read hex: FFFF
+
+  Scenario: word register accessor
+    Given an Emulator with no instructions
+    And register rax is set to hex: 0011223344556677
+    And a register accessor with the following parameters
+      | register  | isPointer | offset | scale | indexReg |
+      | eax       | false     | 0      | 1     |          |
+    When the accessor writes hex: FFFFFFFF
+    Then register rax should have value hex: 00112233FFFFFFFF
+    And the accessor should read hex: FFFFFFFF

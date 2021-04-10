@@ -1,15 +1,16 @@
 import { RegisterAccessor } from '../domains/emulator/memoryAccessors';
+import { RegisterId } from '../domains/emulator/registerTypes';
 import { Given, TableDefinition, Then, When } from 'cucumber';
 import expect from 'expect';
 
 Given('a register accessor with the following parameters', async function (table: TableDefinition) {
   table.hashes().forEach((row) => {
     this.registerAccessor = new RegisterAccessor(
-      row['register'],
+      row['register'] as RegisterId,
       row['isPointer'] == 'true',
       parseInt(row['offset'], 10) || 0,
       getScale(row),
-      row['indexReg'] || '',
+      (row['indexReg'] as RegisterId) || '',
     );
   });
 });
