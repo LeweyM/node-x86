@@ -7,10 +7,14 @@ export class Emulator {
   instructionSet: InstructionSet;
   instructionCounter = 0;
   memory: bigint[] = new Array(100);
+  zeroCond: boolean;
+  negativeCond: boolean;
   constructor(instructionSet: InstructionSet) {
     this.registers = new Registers();
     this.instructionSet = instructionSet;
     this.memory.fill(BigInt(0));
+    this.zeroCond = false;
+    this.negativeCond = false;
   }
 
   setRegister(reg: RegisterId, val: bigint): void {
@@ -19,6 +23,13 @@ export class Emulator {
 
   setMemory(address: number, val: bigint): void {
     this.memory[address] = val;
+  }
+
+  zeroCondition(): boolean {
+    return this.zeroCond;
+  }
+  negativeCondition(): boolean {
+    return this.negativeCond;
   }
 
   step(): void {

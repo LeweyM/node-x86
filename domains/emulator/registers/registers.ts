@@ -23,7 +23,7 @@ export class Registers {
   read(registerName: RegisterId): bigint {
     const register = this.registers[registerName];
     const registerData = this.registerData[register.registerIndex];
-    return this.endBits(register.size, registerData);
+    return this.lowerOrderBits(register.size, registerData);
   }
   write(registerName: RegisterId, value: bigint): void {
     const register = this.registers[registerName];
@@ -32,17 +32,17 @@ export class Registers {
     if (register.size >= 32) {
       this.registerData[register.registerIndex] = value;
     } else {
-      const overwrittenValue = this.overwriteEndBits(register.size, originalValue, value);
+      const overwrittenValue = this.overwriteHigherOrderBits(register.size, originalValue, value);
       this.registerData[register.registerIndex] = overwrittenValue;
     }
   }
 
-  private endBits(bytes: number, value: bigint) {
+  private lowerOrderBits(bytes: number, value: bigint) {
     const mask = BigInt(2 ** bytes) - BigInt(1);
     const endBits = mask & value;
     return endBits;
   }
-  private overwriteEndBits(bytes: number, newEnd: bigint, value: bigint) {
+  private overwriteHigherOrderBits(bytes: number, newEnd: bigint, value: bigint) {
     const valueWithZeroedEnd = (newEnd >> BigInt(bytes)) << BigInt(bytes);
     const valueWithNewEnd = valueWithZeroedEnd ^ value;
     return valueWithNewEnd;
