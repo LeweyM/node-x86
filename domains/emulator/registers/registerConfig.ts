@@ -81,7 +81,7 @@ export type Register = {
   size: 8 | 16 | 32 | 64;
 };
 
-export const ByteRegisters: Record<ByteRegister, Register> = {
+const ByteRegisters: Record<ByteRegister, Register> = {
   [ByteRegister.al]: { registerIndex: 0, size: 8 },
   [ByteRegister.bl]: { registerIndex: 1, size: 8 },
   [ByteRegister.cl]: { registerIndex: 2, size: 8 },
@@ -99,7 +99,7 @@ export const ByteRegisters: Record<ByteRegister, Register> = {
   [ByteRegister.r14b]: { registerIndex: 14, size: 8 },
   [ByteRegister.r15b]: { registerIndex: 15, size: 8 },
 };
-export const WordRegisters: Record<WordRegister, Register> = {
+const WordRegisters: Record<WordRegister, Register> = {
   [WordRegister.ax]: { registerIndex: 0, size: 16 },
   [WordRegister.bx]: { registerIndex: 1, size: 16 },
   [WordRegister.cx]: { registerIndex: 2, size: 16 },
@@ -117,7 +117,7 @@ export const WordRegisters: Record<WordRegister, Register> = {
   [WordRegister.r14w]: { registerIndex: 14, size: 16 },
   [WordRegister.r15w]: { registerIndex: 15, size: 16 },
 };
-export const DoubleRegisters: Record<DoubleRegister, Register> = {
+const DoubleRegisters: Record<DoubleRegister, Register> = {
   [DoubleRegister.eax]: { registerIndex: 0, size: 32 },
   [DoubleRegister.ebx]: { registerIndex: 1, size: 32 },
   [DoubleRegister.ecx]: { registerIndex: 2, size: 32 },
@@ -136,7 +136,7 @@ export const DoubleRegisters: Record<DoubleRegister, Register> = {
   [DoubleRegister.r15d]: { registerIndex: 15, size: 32 },
 };
 
-export const QuadRegisters: Record<QuadRegister, Register> = {
+const QuadRegisters: Record<QuadRegister, Register> = {
   [QuadRegister.rax]: { registerIndex: 0, size: 64 },
   [QuadRegister.rbx]: { registerIndex: 1, size: 64 },
   [QuadRegister.rcx]: { registerIndex: 2, size: 64 },
@@ -153,4 +153,11 @@ export const QuadRegisters: Record<QuadRegister, Register> = {
   [QuadRegister.r13]: { registerIndex: 13, size: 64 },
   [QuadRegister.r14]: { registerIndex: 14, size: 64 },
   [QuadRegister.r15]: { registerIndex: 15, size: 64 },
+};
+
+export const allRegisters: Record<RegisterId, Register> = {
+  ...QuadRegisters,
+  ...DoubleRegisters,
+  ...WordRegisters,
+  ...ByteRegisters,
 };

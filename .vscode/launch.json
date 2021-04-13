@@ -12,12 +12,13 @@
       "name": "Launch Features",
       "stopOnEntry": false,
       "program": "${workspaceRoot}/node_modules/cucumber/bin/cucumber-js",
+      "argsExpansion": "none",
       "args": [
         "features/**/*.feature",
         "--require",
         "world/custom-world.ts",
         "--require", 
-        "step-definitions/**/*.ts",
+        "'step-definitions/**/*.ts'", //<- this gets auto escpaed and breaks!
         "--require",
         "hooks/**/*.ts",
         "--require-module",

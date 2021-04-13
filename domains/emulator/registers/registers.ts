@@ -1,23 +1,11 @@
-import {
-  RegisterId,
-  QuadRegisters,
-  Register,
-  DoubleRegisters,
-  WordRegisters,
-  ByteRegisters,
-} from './registerConfig';
+import { allRegisters as AllRegisters, Register, RegisterId } from './registerConfig';
 
 export class Registers {
   registerData: bigint[];
   registers: Record<RegisterId, Register>;
   constructor() {
     this.registerData = Array(16).fill(BigInt(0));
-    this.registers = {
-      ...QuadRegisters,
-      ...DoubleRegisters,
-      ...WordRegisters,
-      ...ByteRegisters,
-    };
+    this.registers = AllRegisters;
   }
 
   read(registerName: RegisterId): bigint {
