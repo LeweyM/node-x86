@@ -6,11 +6,13 @@ import { AddInstruction } from '../domains/emulator/instruction/addInstruction';
 import { SubInstruction } from '../domains/emulator/instruction/subInstruction';
 import { JumpInstruction } from '../domains/emulator/instruction/jumpInstruction';
 import { RegisterId } from '../domains/emulator/registers/registerConfig';
+import { CallInstruction } from '../domains/emulator/instruction/callInstruction';
+import { ReturnInstruction } from '../domains/emulator/instruction/returnInstruction';
 import { Given, TableDefinition, Then, When } from 'cucumber';
 import expect from 'expect';
 
 Given('register {word} is set to {int}', async function (reg: string, val: number) {
-  this.emulator.setRegister(reg, BigInt(val));
+  this.emulator.setRegister(reg as RegisterId, BigInt(val));
 });
 Given('register {word} is set to hex: {word}', async function (reg: string, hexValue: string) {
   const value = BigInt('0x' + hexValue);
@@ -47,6 +49,10 @@ Given('an emulator with the following instructions', async function (table: Tabl
         return instructionSet.addInstruction(
           new SubInstruction(this.emulator, getSource(row), getTarget(row)),
         );
+      case 'call':
+        return instructionSet.addInstruction(new CallInstruction(this.emulator, row[2]));
+      case 'return':
+        return instructionSet.addInstruction(new ReturnInstruction(this.emulator));
       default:
         throw new Error('unknown symbol');
     }

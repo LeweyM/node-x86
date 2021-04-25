@@ -1,4 +1,3 @@
-@only
 Feature: Condition Instructions
     Condition Instructions
 

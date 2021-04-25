@@ -1,5 +1,29 @@
-# Feature: End to end tests
-#   End to end tests of the x86 Emulator
+Feature: End to end tests
+  End to end tests of the x86 Emulator
+
+  @only
+  Scenario: Simple example
+    Given an emulator with the following raw input
+      | RAW INPUT             |
+      | movq    %rsp, %rbp    |
+      | foo:                  |
+      | pushq   %rbp          |
+      | movq    %rsp, %rbp    |
+      | movl    $5, %eax      |
+      | popq    %rbp          |
+      | ret                   |
+      | main:                 |
+      | pushq   %rbp          |
+      | movq    %rsp, %rbp    |
+      | movl    $0, %eax      |
+      | call    foo           |
+      | popq    %rbp          |
+    And register rbp is set to 8 
+    # rip 48 to start at main:
+    And register rip is set to 48 
+    And register rsp is set to 80
+    When emulator has run
+    Then the process should output 5
 
 #   Scenario: processing and outputing instructions
 #     Given an emulator with the following raw input

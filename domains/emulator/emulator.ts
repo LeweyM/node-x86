@@ -1,11 +1,10 @@
 import { InstructionSet } from './instructionSet';
 import { Registers } from './registers/registers';
-import { RegisterId } from './registers/registerConfig';
+import { QuadRegister, RegisterId } from './registers/registerConfig';
 
 export class Emulator {
   registers: Registers;
   instructionSet: InstructionSet;
-  instructionCounter = 0;
   memory: bigint[] = new Array(100);
   zeroCond: boolean;
   negativeCond: boolean;
@@ -33,12 +32,14 @@ export class Emulator {
   }
 
   step(): void {
-    this.instructionSet.getInstruction(this.instructionCounter).execute();
-    this.instructionCounter++;
+    const instruction = this.instructionSet.getInstruction(
+      Number(this.registers.read(QuadRegister.rip)),
+    );
+    instruction.execute();
+    this.registers.write(QuadRegister.rip, this.registers.read(QuadRegister.rip) + BigInt(8));
   }
-
   run(): void {
-    while (this.instructionSet.hasInstruction(this.instructionCounter)) {
+    while (this.instructionSet.hasInstruction(Number(this.registers.read(QuadRegister.rip)))) {
       this.step();
     }
   }

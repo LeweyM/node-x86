@@ -17,14 +17,16 @@ export class InstructionSet {
   }
 
   getInstruction(n: number): Instruction {
-    return this.instructions[n];
+    const i = n / 8;
+    return this.instructions[i];
   }
 
   getInstructionLocationFromLabel(l: string): number {
-    return this.labels[l];
+    return this.labels[l] * 8;
   }
 
   hasInstruction(n: number): boolean {
-    return n >= 0 && n < this.instructions.length;
+    const i = n / 8;
+    return i >= 0 && i < this.instructions.length;
   }
 }

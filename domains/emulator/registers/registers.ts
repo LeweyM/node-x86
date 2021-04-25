@@ -1,21 +1,20 @@
-import { allRegisters as AllRegisters, Register, RegisterId } from './registerConfig';
+import { allRegisters as AllRegisters, RegisterId } from './registerConfig';
 
 export class Registers {
   registerData: bigint[];
-  registers: Record<RegisterId, Register>;
   constructor() {
-    this.registerData = Array(16).fill(BigInt(0));
-    this.registers = AllRegisters;
+    this.registerData = Array(17).fill(BigInt(0));
   }
 
   read(registerName: RegisterId): bigint {
-    const register = this.registers[registerName];
+    const register = AllRegisters[registerName];
     const registerData = this.registerData[register.registerIndex];
     return this.lowerOrderBits(register.size, registerData);
   }
   write(registerName: RegisterId, value: bigint): void {
-    const register = this.registers[registerName];
+    const register = AllRegisters[registerName];
     const originalValue = this.registerData[register.registerIndex];
+
     // 32 and 64 bit instructions zero out higher order bits
     if (register.size >= 32) {
       this.registerData[register.registerIndex] = value;

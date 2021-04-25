@@ -1,5 +1,6 @@
 import { Instruction } from './instruction';
 import { Emulator } from '../emulator';
+import { QuadRegister } from '../registers/registerConfig';
 export class JumpInstruction implements Instruction {
   label;
   e: Emulator;
@@ -9,7 +10,9 @@ export class JumpInstruction implements Instruction {
   }
 
   execute(): void {
-    const nextInstruction = this.e.instructionSet.getInstructionLocationFromLabel(this.label);
-    this.e.instructionCounter = nextInstruction - 1;
+    this.e.registers.write(
+      QuadRegister.rip,
+      BigInt(this.e.instructionSet.getInstructionLocationFromLabel(this.label)) - BigInt(8),
+    );
   }
 }

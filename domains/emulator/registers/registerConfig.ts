@@ -17,6 +17,7 @@ export enum QuadRegister {
   r13 = 'r13',
   r14 = 'r14',
   r15 = 'r15',
+  rip = 'rip',
 }
 
 export enum DoubleRegister {
@@ -153,6 +154,7 @@ const QuadRegisters: Record<QuadRegister, Register> = {
   [QuadRegister.r13]: { registerIndex: 13, size: 64 },
   [QuadRegister.r14]: { registerIndex: 14, size: 64 },
   [QuadRegister.r15]: { registerIndex: 15, size: 64 },
+  [QuadRegister.rip]: { registerIndex: 16, size: 64 }, //program counter
 };
 
 export const allRegisters: Record<RegisterId, Register> = {
