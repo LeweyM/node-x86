@@ -32,13 +32,24 @@ export class Emulator {
   }
 
   step(): void {
+    console.log(this.registers.read(QuadRegister.rip));
     const instruction = this.instructionSet.getInstruction(
       Number(this.registers.read(QuadRegister.rip)),
     );
+    console.log('EXECUTING: ', instruction.constructor.name);
     instruction.execute();
+    console.log('FINISHED EXECUTING');
     this.registers.write(QuadRegister.rip, this.registers.read(QuadRegister.rip) + BigInt(8));
+    console.log('REG: ', this.registers);
+    console.log(
+      'MEM: ',
+      this.memory.map((v, i) => ({ index: i, value: v })).filter((v) => v.value > 0),
+    );
+    // console.log(this);
   }
   run(): void {
+    console.log(this);
+    // console.log(this.instructionSet.getInstruction(32));
     while (this.instructionSet.hasInstruction(Number(this.registers.read(QuadRegister.rip)))) {
       this.step();
     }

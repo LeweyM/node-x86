@@ -84,7 +84,7 @@ Then(
   'register {word} should have value hex: {word}',
   async function (reg: string, hexValue: string) {
     const value = BigInt('0x' + hexValue);
-    expect(this.emulator.registers.read(reg)).toBe(value);
+    expect(this.emulator.registers.read(reg).toString(16)).toBe(value.toString(16));
   },
 );
 

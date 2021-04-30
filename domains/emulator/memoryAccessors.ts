@@ -1,5 +1,5 @@
 import { Emulator } from './emulator';
-import { RegisterId } from './registers/registerConfig';
+import { allRegisters, RegisterId } from './registers/registerConfig';
 
 export interface MemReader {
   read(e: Emulator): bigint;
@@ -47,6 +47,10 @@ export class RegisterAccessor implements MemReader, MemWriter {
     } else {
       e.registers.write(this.baseRegister, value);
     }
+  }
+
+  size(): number {
+    return allRegisters[this.baseRegister].size;
   }
 
   address(e: Emulator): bigint {

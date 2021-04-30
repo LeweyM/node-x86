@@ -1,10 +1,13 @@
 import { AddInstruction } from '../../../../domains/emulator/instruction/addInstruction';
 import { CallInstruction } from '../../../../domains/emulator/instruction/callInstruction';
+import { CompareInstruction } from '../../../../domains/emulator/instruction/compareInstruction';
 import { Instruction } from '../../../../domains/emulator/instruction/instruction';
+import { LoadAddressInstruction } from '../../../../domains/emulator/instruction/loadAddressInstruction';
 import { MoveInstruction } from '../../../../domains/emulator/instruction/moveInstruction';
 import { PopInstruction } from '../../../../domains/emulator/instruction/popInstruction';
 import { PushInstruction } from '../../../../domains/emulator/instruction/pushInstruction';
 import { ReturnInstruction } from '../../../../domains/emulator/instruction/returnInstruction';
+import { SignExtendedMoveInstruction } from '../../../../domains/emulator/instruction/signExtendedMoveInstruction';
 import {
   ImmediateSource,
   MemReader,
@@ -16,30 +19,45 @@ import { QuadRegister, RegisterId } from '../../../../domains/emulator/registers
 
 describe('parser', () => {
   it('can parse move instructions', () => {
-    const instruction = getInstruction('movq $1, rax');
+    const instruction = getInstruction('movq $1, %rax');
     checkMoveInstruction(instruction);
   });
 
   it('can parse add instructions', () => {
-    const instruction = getInstruction('addq $2, rbx');
+    const instruction = getInstruction('addq $2, %rbx');
     checkAddInstruction(instruction);
   });
 
   it('can parse push instructions', () => {
-    const instruction = getInstruction('pushq rax');
+    const instruction = getInstruction('pushq %rax');
     checkPushInstruction(instruction);
   });
 
   it('can parse pop instructions', () => {
-    const instruction = getInstruction('popq rbx');
+    const instruction = getInstruction('popq %rbx');
     checkPopInstruction(instruction);
   });
 
+  it('can parse load effective address instructions', () => {
+    const instruction = getInstruction('leaq %rax, %rbx');
+    checkLoadEffectiveAddressInstruction(instruction);
+  });
+
+  it('can parse cltq instructions', () => {
+    const instruction = getInstruction('cltq');
+    checkCltqInstruction(instruction);
+  });
+
+  it('can parse compare instructions', () => {
+    const instruction = getInstruction('cmpl %rax, %rbx');
+    checkCompareInstruction(instruction);
+  });
+
   it('can parse multiple instructions', () => {
-    const input = `movq $1, rax
-    addq $2, rbx
-    pushq rax
-    popq rbx`;
+    const input = `movq $1, %rax
+    addq $2, %rbx
+    pushq %rax
+    popq %rbx`;
     const e = new Parser().toEmulator(input);
     const instructions = e.instructionSet;
     checkMoveInstruction(instructions.getInstruction(0));
@@ -92,6 +110,27 @@ function checkPopInstruction(instruction: Instruction) {
   expect(instruction).toBeInstanceOf(PopInstruction);
   const popInstruction = instruction as PopInstruction;
   checkRegister(popInstruction.left, 'rbx' as RegisterId);
+}
+
+function checkCltqInstruction(instruction: Instruction) {
+  expect(instruction).toBeInstanceOf(SignExtendedMoveInstruction);
+  const cltqInstruction = instruction as SignExtendedMoveInstruction;
+  checkRegister(cltqInstruction.left, 'rax' as RegisterId);
+  checkRegister(cltqInstruction.right, 'eax' as RegisterId);
+}
+
+function checkLoadEffectiveAddressInstruction(instruction: Instruction) {
+  expect(instruction).toBeInstanceOf(LoadAddressInstruction);
+  const cltqInstruction = instruction as LoadAddressInstruction;
+  checkRegister(cltqInstruction.left, 'rax' as RegisterId);
+  checkRegister(cltqInstruction.right, 'rbx' as RegisterId);
+}
+
+function checkCompareInstruction(instruction: Instruction) {
+  expect(instruction).toBeInstanceOf(CompareInstruction);
+  const cltqInstruction = instruction as CompareInstruction;
+  checkRegister(cltqInstruction.left, 'rax' as RegisterId);
+  checkRegister(cltqInstruction.right, 'rbx' as RegisterId);
 }
 
 function getInstruction(input: string) {
