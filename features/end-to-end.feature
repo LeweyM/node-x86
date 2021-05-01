@@ -62,10 +62,10 @@ Feature: End to end tests
   #      | movl    $4, %esi           |
   #      | movq    %rax, %rdi         |
   #      | call    foo                |
-  #      | leave                      |
-  #      | ret                        |
+  #     #  | leave                      |
+  #     #  | ret                        |
   #   And register rbp is set to 8
   #   # rip 48 to start at main:
-  #   And register rip is set to 160
+  #   And register rip is set to 168
   #   And register rsp is set to 80
   #   When emulator has run

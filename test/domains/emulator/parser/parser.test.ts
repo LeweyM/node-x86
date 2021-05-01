@@ -2,12 +2,14 @@ import { AddInstruction } from '../../../../domains/emulator/instruction/addInst
 import { CallInstruction } from '../../../../domains/emulator/instruction/callInstruction';
 import { CompareInstruction } from '../../../../domains/emulator/instruction/compareInstruction';
 import { Instruction } from '../../../../domains/emulator/instruction/instruction';
+import { JumpIfLessInstruction } from '../../../../domains/emulator/instruction/jumpIfLessInstruction';
 import { LoadAddressInstruction } from '../../../../domains/emulator/instruction/loadAddressInstruction';
 import { MoveInstruction } from '../../../../domains/emulator/instruction/moveInstruction';
 import { PopInstruction } from '../../../../domains/emulator/instruction/popInstruction';
 import { PushInstruction } from '../../../../domains/emulator/instruction/pushInstruction';
 import { ReturnInstruction } from '../../../../domains/emulator/instruction/returnInstruction';
 import { SignExtendedMoveInstruction } from '../../../../domains/emulator/instruction/signExtendedMoveInstruction';
+import { SubInstruction } from '../../../../domains/emulator/instruction/subInstruction';
 import {
   ImmediateSource,
   MemReader,
@@ -26,6 +28,11 @@ describe('parser', () => {
   it('can parse add instructions', () => {
     const instruction = getInstruction('addq $2, %rbx');
     checkAddInstruction(instruction);
+  });
+
+  it('can parse sub instructions', () => {
+    const instruction = getInstruction('subq $16, %rsp');
+    checkSubInstruction(instruction);
   });
 
   it('can parse push instructions', () => {
@@ -51,6 +58,11 @@ describe('parser', () => {
   it('can parse compare instructions', () => {
     const instruction = getInstruction('cmpl %rax, %rbx');
     checkCompareInstruction(instruction);
+  });
+
+  it('can parse jump if less instructions', () => {
+    const instruction = getInstruction('jl .L3');
+    checkJumpIfLessInstruction(instruction);
   });
 
   it('can parse multiple instructions', () => {
@@ -99,6 +111,13 @@ function checkAddInstruction(instruction: Instruction) {
   checkRegister(addInstruction.right, QuadRegister.rbx);
 }
 
+function checkSubInstruction(instruction: Instruction) {
+  expect(instruction).toBeInstanceOf(SubInstruction);
+  const sub = instruction as SubInstruction;
+  checkConstant(sub.left, 16);
+  checkRegister(sub.right, QuadRegister.rsp);
+}
+
 function checkMoveInstruction(instruction: Instruction) {
   expect(instruction).toBeInstanceOf(MoveInstruction);
   const moveInstruction = instruction as MoveInstruction;
@@ -131,6 +150,12 @@ function checkCompareInstruction(instruction: Instruction) {
   const cltqInstruction = instruction as CompareInstruction;
   checkRegister(cltqInstruction.left, 'rax' as RegisterId);
   checkRegister(cltqInstruction.right, 'rbx' as RegisterId);
+}
+
+function checkJumpIfLessInstruction(instruction: Instruction) {
+  expect(instruction).toBeInstanceOf(JumpIfLessInstruction);
+  const jlInstruction = instruction as JumpIfLessInstruction;
+  expect(jlInstruction.label).toBe('L3');
 }
 
 function getInstruction(input: string) {

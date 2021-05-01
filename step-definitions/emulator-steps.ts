@@ -8,6 +8,8 @@ import { JumpInstruction } from '../domains/emulator/instruction/jumpInstruction
 import { RegisterId } from '../domains/emulator/registers/registerConfig';
 import { CallInstruction } from '../domains/emulator/instruction/callInstruction';
 import { ReturnInstruction } from '../domains/emulator/instruction/returnInstruction';
+import { JumpIfLessInstruction } from '../domains/emulator/instruction/jumpIfLessInstruction';
+import { CompareInstruction } from '../domains/emulator/instruction/compareInstruction';
 import { Given, TableDefinition, Then, When } from 'cucumber';
 import expect from 'expect';
 
@@ -37,6 +39,12 @@ Given('an emulator with the following instructions', async function (table: Tabl
         return instructionSet.addLabel(row[2]);
       case 'jmp':
         return instructionSet.addInstruction(new JumpInstruction(this.emulator, row[2]));
+      case 'cmpl':
+        return instructionSet.addInstruction(
+          new CompareInstruction(this.emulator, getSource(row), getTarget(row)),
+        );
+      case 'jl':
+        return instructionSet.addInstruction(new JumpIfLessInstruction(this.emulator, row[2]));
       case 'mov':
         return instructionSet.addInstruction(
           new MoveInstruction(this.emulator, getSource(row), getTarget(row)),
@@ -83,8 +91,9 @@ Then('register {word} should have value {int}', async function (reg: string, val
 Then(
   'register {word} should have value hex: {word}',
   async function (reg: string, hexValue: string) {
-    const value = BigInt('0x' + hexValue);
-    expect(this.emulator.registers.read(reg).toString(16)).toBe(value.toString(16));
+    const expected = BigInt('0x' + hexValue);
+    const value = BigInt.asUintN(64, this.emulator.registers.read(reg));
+    expect(value.toString(16)).toBe(expected.toString(16));
   },
 );
 

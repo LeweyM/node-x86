@@ -2,6 +2,7 @@ import { Emulator } from '../emulator';
 import { AddInstruction } from '../instruction/addInstruction';
 import { CallInstruction } from '../instruction/callInstruction';
 import { CompareInstruction } from '../instruction/compareInstruction';
+import { JumpIfLessInstruction } from '../instruction/jumpIfLessInstruction';
 import { JumpInstruction } from '../instruction/jumpInstruction';
 import { LoadAddressInstruction } from '../instruction/loadAddressInstruction';
 import { MoveInstruction } from '../instruction/moveInstruction';
@@ -9,6 +10,7 @@ import { PopInstruction } from '../instruction/popInstruction';
 import { PushInstruction } from '../instruction/pushInstruction';
 import { ReturnInstruction } from '../instruction/returnInstruction';
 import { SignExtendedMoveInstruction } from '../instruction/signExtendedMoveInstruction';
+import { SubInstruction } from '../instruction/subInstruction';
 import { InstructionSet } from '../instructionSet';
 import { ImmediateSource, MemReader, MemWriter, RegisterAccessor } from '../memoryAccessors';
 import { RegisterId } from '../registers/registerConfig';
@@ -40,6 +42,11 @@ export class Parser {
         new AddInstruction(e, this.getReaderAccessor(line[1]), this.getWriterAccessor(line[2])),
       );
       return;
+    } else if (line[0].startsWith('sub')) {
+      instructions.addInstruction(
+        new SubInstruction(e, this.getReaderAccessor(line[1]), this.getWriterAccessor(line[2])),
+      );
+      return;
     } else if (line[0].startsWith('push')) {
       instructions.addInstruction(new PushInstruction(e, this.getReaderAccessor(line[1])));
       return;
@@ -54,6 +61,8 @@ export class Parser {
       return;
     } else if (line[0].startsWith('jmp')) {
       instructions.addInstruction(new JumpInstruction(e, line[1].replace(remove, '')));
+    } else if (line[0].startsWith('jl')) {
+      instructions.addInstruction(new JumpIfLessInstruction(e, line[1].replace(remove, '')));
     } else if (line[0].startsWith('leaq')) {
       instructions.addInstruction(
         new LoadAddressInstruction(
