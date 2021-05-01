@@ -79,8 +79,8 @@ export class Parser {
       instructions.addInstruction(
         new SignExtendedMoveInstruction(
           e,
-          this.getWriterAccessor('rax') as RegisterAccessor,
-          this.getWriterAccessor('eax') as RegisterAccessor,
+          this.getWriterAccessor('%rax') as RegisterAccessor,
+          this.getWriterAccessor('%eax') as RegisterAccessor,
         ),
       );
     } else if (line[0].endsWith(':')) {
@@ -91,7 +91,15 @@ export class Parser {
   }
 
   private getWriterAccessor(input: string): MemReader & MemWriter {
-    return new RegisterAccessor(input.replace(remove, '') as RegisterId);
+    const regex = /(-?\d+)?(\()?(%[a-z]+)/;
+    const match = input.match(regex);
+    if (!match) {
+      throw new Error('cannot parse');
+    }
+    const baseRegister = match[3].replace(remove, '') as RegisterId;
+    const isPointer = match[2] == '(';
+    const offset = parseInt(match[1], 10);
+    return new RegisterAccessor(baseRegister, isPointer, offset);
   }
 
   private getReaderAccessor(input: string): MemReader {

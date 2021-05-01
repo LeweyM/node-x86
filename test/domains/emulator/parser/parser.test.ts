@@ -25,6 +25,16 @@ describe('parser', () => {
     checkMoveInstruction(instruction);
   });
 
+  it('can parse pointer and offset instructions', () => {
+    const instruction = getInstruction('movq    %rdi, -24(%rbp)');
+    expect(instruction).toBeInstanceOf(MoveInstruction);
+    const moveInstruction = instruction as MoveInstruction;
+    const accessor = moveInstruction.right as RegisterAccessor;
+    expect(accessor.baseRegister).toBe('rbp');
+    expect(accessor.isPointer).toBeTruthy();
+    expect(accessor.offset).toBe(-24);
+  });
+
   it('can parse add instructions', () => {
     const instruction = getInstruction('addq $2, %rbx');
     checkAddInstruction(instruction);
