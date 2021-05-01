@@ -1,4 +1,3 @@
-@only
 Feature: Sign Extension Instructions
   Sign Extension instruction
 
