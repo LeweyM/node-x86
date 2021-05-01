@@ -26,8 +26,10 @@ Then('the accessor should read {int}', async function (value: number) {
   expect(this.registerAccessor.read(this.emulator)).toBe(BigInt(value));
 });
 Then('the accessor should read hex: {word}', async function (hexValue: string) {
-  const value = BigInt('0x' + hexValue);
-  expect(this.registerAccessor.read(this.emulator)).toBe(value);
+  const expected = BigInt('0x' + hexValue);
+  const bytes = hexValue.length * 4;
+  const value = BigInt.asUintN(bytes, this.registerAccessor.read(this.emulator));
+  expect(value).toBe(expected);
 });
 
 function getScale(row: { [x: string]: string }): 1 | 2 | 4 | 8 {

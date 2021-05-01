@@ -9,7 +9,8 @@ export class Registers {
   read(registerName: RegisterId): bigint {
     const register = AllRegisters[registerName];
     const registerData = this.registerData[register.registerIndex];
-    return this.lowerOrderBits(register.size, registerData);
+    const bits = this.lowerOrderBits(register.size, registerData);
+    return bits;
   }
   write(registerName: RegisterId, value: bigint): void {
     const register = AllRegisters[registerName];
@@ -25,9 +26,9 @@ export class Registers {
   }
 
   private lowerOrderBits(bytes: number, value: bigint) {
-    const mask = BigInt(2 ** bytes) - BigInt(1);
-    const endBits = mask & value;
-    return endBits;
+    // const mask = BigInt.asUintN(bytes, BigInt(0)) - BigInt(1);
+    // const endBits = mask & value;
+    return BigInt.asIntN(bytes, value);
   }
   private overwriteHigherOrderBits(bytes: number, newEnd: bigint, value: bigint) {
     const valueWithZeroedEnd = (newEnd >> BigInt(bytes)) << BigInt(bytes);

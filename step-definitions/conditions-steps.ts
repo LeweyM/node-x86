@@ -22,9 +22,13 @@ Given(
 
 Then('zero compare code should be {word}', async function (code: string) {
   const codeSet = code == 'true';
-  expect(this.emulator.zeroCondition()).toEqual(codeSet);
+  expect(this.emulator.zeroFlag()).toEqual(codeSet);
 });
 Then('negative compare code should be {word}', async function (code: string) {
   const codeSet = code == 'true';
-  expect(this.emulator.negativeCondition()).toEqual(codeSet);
+  expect(this.emulator.signFlag()).toEqual(codeSet);
+});
+Then('overflow compare code should be {word}', async function (code: string) {
+  const codeSet = code == 'true';
+  expect(this.emulator.overflowFlag()).toEqual(codeSet);
 });

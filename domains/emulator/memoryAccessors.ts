@@ -3,6 +3,7 @@ import { allRegisters, RegisterId } from './registers/registerConfig';
 
 export interface MemReader {
   read(e: Emulator): bigint;
+  size(): number;
 }
 
 export interface MemWriter {
@@ -17,6 +18,10 @@ export class ImmediateSource implements MemReader {
   }
   read(_e: Emulator): bigint {
     return this.val;
+  }
+
+  size(): number {
+    return 64;
   }
 }
 
