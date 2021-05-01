@@ -108,16 +108,16 @@ export class Parser {
     if (!match) {
       throw new Error('cannot parse');
     }
-    const offset = parseInt(match[1], 10);
+    const offset = match[1] ? parseInt(match[1], 10) : undefined;
     const isPointer = match[2] == '(';
     const indexRegister = match[3] && (match[3].replace(remove, '') as RegisterId);
     const baseRegister = match[4].replace(remove, '') as RegisterId;
-    const scale = parseInt(match[5], 10);
+    const scale = match[5] && parseInt(match[5], 10);
     return new RegisterAccessor(
       baseRegister,
       isPointer,
       offset,
-      (scale as 1 | 2 | 4 | 8) || 1,
+      scale as 1 | 2 | 4 | 8,
       indexRegister,
     );
   }

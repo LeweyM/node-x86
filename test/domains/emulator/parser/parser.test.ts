@@ -53,6 +53,13 @@ describe('parser', () => {
     expect(left.offset).toBe(8);
     expect(left.scale).toBe(4);
     expect(left.indexRegister).toBe('al');
+
+    const right = moveInstruction.right as RegisterAccessor;
+    expect(right.baseRegister).toBe('rbp');
+    expect(right.isPointer).toBeFalsy();
+    expect(right.offset).toBe(0);
+    expect(right.scale).toBe(1);
+    expect(right.indexRegister).toBe('');
   });
 
   it('can parse add instructions', () => {
