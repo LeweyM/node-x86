@@ -103,15 +103,23 @@ export class Parser {
   }
 
   private parseRegister(input: string): RegisterAccessor {
-    const regex = /(-?\d+)?(\()?(%[a-z]+)/;
+    const regex = /(-?\d+)?(\()?(%[a-z]+)?,?(%[a-z]+),?(\d+)?\)?/;
     const match = input.match(regex);
     if (!match) {
       throw new Error('cannot parse');
     }
-    const baseRegister = match[3].replace(remove, '') as RegisterId;
-    const isPointer = match[2] == '(';
     const offset = parseInt(match[1], 10);
-    return new RegisterAccessor(baseRegister, isPointer, offset);
+    const isPointer = match[2] == '(';
+    const indexRegister = match[3] && (match[3].replace(remove, '') as RegisterId);
+    const baseRegister = match[4].replace(remove, '') as RegisterId;
+    const scale = parseInt(match[5], 10);
+    return new RegisterAccessor(
+      baseRegister,
+      isPointer,
+      offset,
+      (scale as 1 | 2 | 4 | 8) || 1,
+      indexRegister,
+    );
   }
 }
 

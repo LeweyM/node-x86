@@ -42,6 +42,19 @@ describe('parser', () => {
     expect(left.offset).toBe(-18);
   });
 
+  it('can parse scale instructions', () => {
+    const instruction = getInstruction('movq 8(%al,%rax,4), %rbp');
+    expect(instruction).toBeInstanceOf(MoveInstruction);
+    const moveInstruction = instruction as MoveInstruction;
+
+    const left = moveInstruction.left as RegisterAccessor;
+    expect(left.baseRegister).toBe('rax');
+    expect(left.isPointer).toBeTruthy();
+    expect(left.offset).toBe(8);
+    expect(left.scale).toBe(4);
+    expect(left.indexRegister).toBe('al');
+  });
+
   it('can parse add instructions', () => {
     const instruction = getInstruction('addq $2, %rbx');
     checkAddInstruction(instruction);
