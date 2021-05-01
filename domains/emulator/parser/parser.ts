@@ -60,9 +60,9 @@ export class Parser {
       instructions.addInstruction(new ReturnInstruction(e));
       return;
     } else if (line[0].startsWith('jmp')) {
-      instructions.addInstruction(new JumpInstruction(e, line[1].replace(remove, '')));
+      instructions.addInstruction(new JumpInstruction(e, line[1]));
     } else if (line[0].startsWith('jl')) {
-      instructions.addInstruction(new JumpIfLessInstruction(e, line[1].replace(remove, '')));
+      instructions.addInstruction(new JumpIfLessInstruction(e, line[1]));
     } else if (line[0].startsWith('leaq')) {
       instructions.addInstruction(
         new LoadAddressInstruction(
@@ -91,6 +91,18 @@ export class Parser {
   }
 
   private getWriterAccessor(input: string): MemReader & MemWriter {
+    return this.parseRegister(input);
+  }
+
+  private getReaderAccessor(input: string): MemReader {
+    if (input.startsWith('$')) {
+      return new ImmediateSource(BigInt(parseInt(input.replace(remove, ''), 10)));
+    } else {
+      return this.parseRegister(input);
+    }
+  }
+
+  private parseRegister(input: string): RegisterAccessor {
     const regex = /(-?\d+)?(\()?(%[a-z]+)/;
     const match = input.match(regex);
     if (!match) {
@@ -100,15 +112,6 @@ export class Parser {
     const isPointer = match[2] == '(';
     const offset = parseInt(match[1], 10);
     return new RegisterAccessor(baseRegister, isPointer, offset);
-  }
-
-  private getReaderAccessor(input: string): MemReader {
-    if (input.startsWith('$')) {
-      return new ImmediateSource(BigInt(parseInt(input.replace(remove, ''), 10)));
-    } else {
-      const register = input.replace(remove, '') as RegisterId;
-      return new RegisterAccessor(register);
-    }
   }
 }
 

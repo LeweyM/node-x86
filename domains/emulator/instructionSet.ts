@@ -22,7 +22,11 @@ export class InstructionSet {
   }
 
   getInstructionLocationFromLabel(l: string): number {
-    return this.labels[l] * 8;
+    const instructionIndex = this.labels[l] * 8;
+    if (isNaN(instructionIndex)) {
+      throw new Error('Cannot process label: ' + l);
+    }
+    return instructionIndex;
   }
 
   hasInstruction(n: number): boolean {

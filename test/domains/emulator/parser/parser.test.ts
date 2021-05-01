@@ -3,6 +3,7 @@ import { CallInstruction } from '../../../../domains/emulator/instruction/callIn
 import { CompareInstruction } from '../../../../domains/emulator/instruction/compareInstruction';
 import { Instruction } from '../../../../domains/emulator/instruction/instruction';
 import { JumpIfLessInstruction } from '../../../../domains/emulator/instruction/jumpIfLessInstruction';
+import { JumpInstruction } from '../../../../domains/emulator/instruction/jumpInstruction';
 import { LoadAddressInstruction } from '../../../../domains/emulator/instruction/loadAddressInstruction';
 import { MoveInstruction } from '../../../../domains/emulator/instruction/moveInstruction';
 import { PopInstruction } from '../../../../domains/emulator/instruction/popInstruction';
@@ -26,13 +27,19 @@ describe('parser', () => {
   });
 
   it('can parse pointer and offset instructions', () => {
-    const instruction = getInstruction('movq    %rdi, -24(%rbp)');
+    const instruction = getInstruction('movq -18(%rax), -24(%rbp)');
     expect(instruction).toBeInstanceOf(MoveInstruction);
     const moveInstruction = instruction as MoveInstruction;
-    const accessor = moveInstruction.right as RegisterAccessor;
-    expect(accessor.baseRegister).toBe('rbp');
-    expect(accessor.isPointer).toBeTruthy();
-    expect(accessor.offset).toBe(-24);
+
+    const right = moveInstruction.right as RegisterAccessor;
+    expect(right.baseRegister).toBe('rbp');
+    expect(right.isPointer).toBeTruthy();
+    expect(right.offset).toBe(-24);
+
+    const left = moveInstruction.left as RegisterAccessor;
+    expect(left.baseRegister).toBe('rax');
+    expect(left.isPointer).toBeTruthy();
+    expect(left.offset).toBe(-18);
   });
 
   it('can parse add instructions', () => {
@@ -70,6 +77,11 @@ describe('parser', () => {
     checkCompareInstruction(instruction);
   });
 
+  it('can parse jump instructions', () => {
+    const instruction = getInstruction('jmp .L3');
+    checkJumpInstruction(instruction);
+  });
+
   it('can parse jump if less instructions', () => {
     const instruction = getInstruction('jl .L3');
     checkJumpIfLessInstruction(instruction);
@@ -101,9 +113,9 @@ describe('parser', () => {
   });
 
   it('can parse labels', () => {
-    const e = new Parser().toEmulator('\nret\nfoo:');
+    const e = new Parser().toEmulator('\nret\n.foo:');
     const instructions = e.instructionSet;
-    const i = instructions.getInstructionLocationFromLabel('foo');
+    const i = instructions.getInstructionLocationFromLabel('.foo');
     expect(i).toBe(8);
   });
 });
@@ -165,7 +177,13 @@ function checkCompareInstruction(instruction: Instruction) {
 function checkJumpIfLessInstruction(instruction: Instruction) {
   expect(instruction).toBeInstanceOf(JumpIfLessInstruction);
   const jlInstruction = instruction as JumpIfLessInstruction;
-  expect(jlInstruction.label).toBe('L3');
+  expect(jlInstruction.label).toBe('.L3');
+}
+
+function checkJumpInstruction(instruction: Instruction) {
+  expect(instruction).toBeInstanceOf(JumpInstruction);
+  const jlInstruction = instruction as JumpInstruction;
+  expect(jlInstruction.label).toBe('.L3');
 }
 
 function getInstruction(input: string) {
