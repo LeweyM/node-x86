@@ -10,7 +10,7 @@ export class ReturnInstruction implements Instruction {
     const stackPointer = this.e.registers.read(QuadRegister.rsp);
 
     // pop value off stack
-    const stackValue = this.e.memory[Number(stackPointer)];
+    const stackValue = this.e.readMemory(stackPointer);
     // set program counter to value at stack
     this.e.registers.write(QuadRegister.rip, stackValue);
 

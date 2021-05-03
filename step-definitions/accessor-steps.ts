@@ -25,12 +25,29 @@ When('the accessor writes hex: {word}', async function (hexValue: string) {
 Then('the accessor should read {int}', async function (value: number) {
   expect(this.registerAccessor.read(this.emulator)).toBe(BigInt(value));
 });
+
 Then('the accessor should read hex: {word}', async function (hexValue: string) {
   const expected = BigInt('0x' + hexValue);
   const bytes = hexValue.length * 4;
   const value = BigInt.asUintN(bytes, this.registerAccessor.read(this.emulator));
   expect(value).toBe(expected);
 });
+
+When(
+  'writing {int} byte of memory at address {int} to hex: {word}',
+  async function (bytes: number, address: number, hexValue: string) {
+    const value = BigInt('0x' + hexValue);
+    this.emulator.writeBytesToMemory(bytes, address, value);
+  },
+);
+
+Then(
+  'reading {int} byte of memory from address {int} should give hex: {word}',
+  async function (bytes: number, address: number, hexValue: string) {
+    const value = this.emulator.readBytesFromMemory(bytes, address);
+    expect(value.toString(16).toUpperCase()).toBe(hexValue);
+  },
+);
 
 function getScale(row: { [x: string]: string }): 1 | 2 | 4 | 8 {
   const scaleValue = parseInt(row['scale'], 10);

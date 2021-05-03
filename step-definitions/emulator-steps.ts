@@ -25,6 +25,12 @@ Given('memory {int} is set to {int}', async function (memAddress, val: number) {
   this.emulator.setMemory(memAddress, BigInt(val));
 });
 
+Given('the following in memory', async function (table: TableDefinition) {
+  table.hashes().forEach((row) => {
+    this.emulator.setMemory(row.memAddress, BigInt(parseInt(row.hex, 16)));
+  });
+});
+
 Given('an Emulator with no instructions', async function () {
   this.emulator = new Emulator(new InstructionSet());
 });
