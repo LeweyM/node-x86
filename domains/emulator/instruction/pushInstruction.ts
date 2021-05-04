@@ -16,6 +16,6 @@ export class PushInstruction implements Instruction {
     }
     this.e.registers.write(QuadRegister.rsp, stackPointer);
 
-    this.e.setMemory(Number(stackPointer), this.left.read(this.e));
+    this.e.writeBytesToMemory(8, Number(stackPointer), this.left.read(this.e));
   }
 }

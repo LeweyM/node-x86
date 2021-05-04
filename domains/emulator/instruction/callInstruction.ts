@@ -19,7 +19,7 @@ export class CallInstruction implements Instruction {
     const programCounter = this.e.registers.read(QuadRegister.rip);
 
     // push the current program counter value onto the stack
-    this.e.setMemory(Number(stackPointer), programCounter);
+    this.e.writeBytesToMemory(8, Number(stackPointer), programCounter);
 
     // jump to byte before instruction at label
     this.e.registers.write(

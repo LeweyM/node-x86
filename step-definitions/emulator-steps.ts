@@ -14,20 +14,20 @@ import { Given, TableDefinition, Then, When } from 'cucumber';
 import expect from 'expect';
 
 Given('register {word} is set to {int}', async function (reg: string, val: number) {
-  this.emulator.setRegister(reg as RegisterId, BigInt(val));
+  this.emulator.registers.write(reg as RegisterId, BigInt(val));
 });
 Given('register {word} is set to hex: {word}', async function (reg: string, hexValue: string) {
   const value = BigInt('0x' + hexValue);
-  this.emulator.setRegister(reg, value);
+  this.emulator.registers.write(reg, value);
 });
 
 Given('memory {int} is set to {int}', async function (memAddress, val: number) {
-  this.emulator.setMemory(memAddress, BigInt(val));
+  this.emulator.writeBytesToMemory(8, memAddress, BigInt(val));
 });
 
 Given('the following in memory', async function (table: TableDefinition) {
   table.hashes().forEach((row) => {
-    this.emulator.setMemory(row.memAddress, BigInt(parseInt(row.hex, 16)));
+    this.emulator.writeBytesToMemory(1, parseInt(row.memAddress), BigInt(parseInt(row.hex, 16)));
   });
 });
 
@@ -88,7 +88,7 @@ When('emulator has run', async function () {
 });
 
 Then('memory address {int} should have value {int}', async function (memAddress, value: number) {
-  expect(this.emulator.memory[memAddress]).toEqual(BigInt(value));
+  expect(this.emulator.readBytesFromMemory(8, memAddress)).toEqual(BigInt(value));
 });
 
 Then('register {word} should have value {int}', async function (reg: string, val: number) {

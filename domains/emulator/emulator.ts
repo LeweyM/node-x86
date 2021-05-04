@@ -1,11 +1,10 @@
 import { InstructionSet } from './instructionSet';
+import { allRegisters, QuadRegister } from './registers/registerConfig';
 import { Registers } from './registers/registers';
-import { allRegisters, QuadRegister, RegisterId } from './registers/registerConfig';
 
 export class Emulator {
   registers: Registers;
   instructionSet: InstructionSet;
-  memory: bigint[] = new Array(1000);
   bytes: Uint8Array = new Uint8Array(1000);
   zeroCond: boolean;
   overflowCond: boolean;
@@ -13,35 +12,18 @@ export class Emulator {
   constructor(instructionSet: InstructionSet) {
     this.registers = new Registers();
     this.instructionSet = instructionSet;
-    this.memory.fill(BigInt(0));
     this.overflowCond = false;
     this.zeroCond = false;
     this.signCond = false;
-  }
-
-  setRegister(reg: RegisterId, val: bigint): void {
-    this.registers.write(reg, val);
-  }
-
-  setMemory(address: number, val: bigint): void {
-    this.memory[address] = val;
-    // and
-    this.bytes[address] = Number(BigInt.asUintN(8, val));
   }
 
   writeBytesToMemory(_bytes: number, address: number, val: bigint): void {
     for (let i = 0; i < _bytes; i++) {
       const mask: bigint = (BigInt(2) ** BigInt(8) - BigInt(1)) << BigInt(8 * i);
       const res = (val & BigInt(mask)) >> BigInt(8 * i);
-
-      console.log('mask:', mask.toString(16));
-      console.log('val:', val.toString(16));
-      console.log('res:', res.toString(16));
-      this.bytes[address + _bytes - (i + 1)] = Number(res);
+      const index = address + _bytes - (i + 1);
+      this.bytes[index] = Number(res);
     }
-  }
-  readMemory(address: bigint): bigint {
-    return this.memory[Number(address)];
   }
   readBytesFromMemory(_bytes: number, address: bigint): bigint {
     let v = BigInt.asIntN(_bytes * 8, BigInt(0));
@@ -82,7 +64,10 @@ export class Emulator {
     );
     console.log(
       'MEM: ',
-      this.memory.map((v, i) => ({ index: i, value: v })).filter((v) => v.value > 0),
+      Array.from(this.bytes)
+        .map((v, i) => ({ index: i, value: v }))
+        .filter((v) => v.value > 0)
+        .map((v) => ({ index: v.index, value: v.value.toString(16) })),
     );
   }
   run(): void {

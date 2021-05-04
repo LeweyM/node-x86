@@ -48,7 +48,7 @@ export class RegisterAccessor implements MemReader, MemWriter {
   }
   write(e: Emulator, value: bigint): void {
     if (this.isPointer) {
-      e.setMemory(Number(this.getAddress(e)), value);
+      e.writeBytesToMemory(8, Number(this.getAddress(e)), value);
     } else {
       e.registers.write(this.baseRegister, value);
     }
@@ -64,7 +64,7 @@ export class RegisterAccessor implements MemReader, MemWriter {
 
   read(e: Emulator): bigint {
     if (this.isPointer) {
-      return e.readMemory(this.getAddress(e));
+      return e.readBytesFromMemory(8, this.getAddress(e));
     } else {
       return e.registers.read(this.baseRegister);
     }
