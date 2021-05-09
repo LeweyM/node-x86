@@ -28,33 +28,42 @@ export class ImmediateSource implements MemReader {
 type allowedScaleValue = 1 | 2 | 4 | 8;
 
 export class RegisterAccessor implements MemReader, MemWriter {
-  baseRegister: RegisterId;
-  offset: number;
+  baseRegister: RegisterId | null;
   isPointer: boolean;
+  offset: number;
   scale: allowedScaleValue;
   indexRegister: RegisterId | '';
+  bytes;
   constructor(
-    register: RegisterId,
+    baseRegister: RegisterId | null = null,
     isPointer = false,
     offset = 0,
     scale: allowedScaleValue = 1,
-    indexRegiser: RegisterId | '' = '',
+    indexRegister: RegisterId | '' = '',
+    bytes = 8,
   ) {
-    this.baseRegister = register;
-    this.indexRegister = indexRegiser;
-    this.offset = offset;
+    this.baseRegister = baseRegister;
     this.isPointer = isPointer;
+    this.offset = offset;
     this.scale = scale;
+    this.indexRegister = indexRegister;
+    this.bytes = bytes;
   }
   write(e: Emulator, value: bigint): void {
     if (this.isPointer) {
-      e.writeBytesToMemory(8, Number(this.getAddress(e)), value);
+      e.writeBytesToMemory(this.bytes, Number(this.getAddress(e)), value);
     } else {
+      if (!this.baseRegister) {
+        throw new Error('no base register');
+      }
       e.registers.write(this.baseRegister, value);
     }
   }
 
   size(): number {
+    if (!this.baseRegister) {
+      throw new Error('no base register');
+    }
     return allRegisters[this.baseRegister].size;
   }
 
@@ -64,16 +73,25 @@ export class RegisterAccessor implements MemReader, MemWriter {
 
   read(e: Emulator): bigint {
     if (this.isPointer) {
-      return e.readBytesFromMemory(8, this.getAddress(e));
+      return e.readBytesFromMemory(this.bytes, this.getAddress(e));
     } else {
+      if (!this.baseRegister) {
+        throw new Error('no base register');
+      }
       return e.registers.read(this.baseRegister);
     }
   }
 
   private getAddress(e: Emulator) {
-    const valueAtBaseRegister = e.registers.read(this.baseRegister);
     const valueAtIndexRegister =
       this.indexRegister == '' ? BigInt(0) : e.registers.read(this.indexRegister);
+
+    let valueAtBaseRegister;
+    if (this.baseRegister) {
+      valueAtBaseRegister = e.registers.read(this.baseRegister);
+    } else {
+      valueAtBaseRegister = BigInt(0);
+    }
     return valueAtBaseRegister + valueAtIndexRegister * BigInt(this.scale) + BigInt(this.offset);
   }
 }

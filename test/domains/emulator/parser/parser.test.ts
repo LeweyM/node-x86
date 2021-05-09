@@ -26,6 +26,22 @@ describe('parser', () => {
     checkMoveInstruction(instruction);
   });
 
+  it('can parse move instructions of different sizes', () => {
+    checkBytes((getInstruction('movq $1, %rax') as MoveInstruction).right, 8);
+    checkBytes((getInstruction('movl $1, %rax') as MoveInstruction).right, 4);
+    checkBytes((getInstruction('movl %rax, %eax') as MoveInstruction).left, 4);
+    checkBytes((getInstruction('movw $1, %rax') as MoveInstruction).right, 2);
+    checkBytes((getInstruction('movb $1, %rax') as MoveInstruction).right, 1);
+  });
+
+  it('can parse add instructions of different sizes', () => {
+    checkBytes((getInstruction('addq $1, %rax') as AddInstruction).right, 8);
+    checkBytes((getInstruction('addl $1, %rax') as AddInstruction).right, 4);
+    checkBytes((getInstruction('addl %rax, %eax') as AddInstruction).left, 4);
+    checkBytes((getInstruction('addw $1, %rax') as AddInstruction).right, 2);
+    checkBytes((getInstruction('addb $1, %rax') as AddInstruction).right, 1);
+  });
+
   it('can parse pointer and offset instructions', () => {
     const instruction = getInstruction('movq -18(%rax), -24(%rbp)');
     expect(instruction).toBeInstanceOf(MoveInstruction);
@@ -48,18 +64,24 @@ describe('parser', () => {
     const moveInstruction = instruction as MoveInstruction;
 
     const left = moveInstruction.left as RegisterAccessor;
-    expect(left.baseRegister).toBe('rax');
+    expect(left.indexRegister).toBe('rax');
     expect(left.isPointer).toBeTruthy();
     expect(left.offset).toBe(8);
     expect(left.scale).toBe(4);
-    expect(left.indexRegister).toBe('al');
+    expect(left.baseRegister).toBe('al');
+  });
 
-    const right = moveInstruction.right as RegisterAccessor;
-    expect(right.baseRegister).toBe('rbp');
-    expect(right.isPointer).toBeFalsy();
-    expect(right.offset).toBe(0);
-    expect(right.scale).toBe(1);
-    expect(right.indexRegister).toBe('');
+  it('can parse scale instructions with empty base register', () => {
+    const instruction = getInstruction('movq 8(,%rax,4), %rbp');
+    expect(instruction).toBeInstanceOf(MoveInstruction);
+    const moveInstruction = instruction as MoveInstruction;
+
+    const left = moveInstruction.left as RegisterAccessor;
+    expect(left.indexRegister).toBe('rax');
+    expect(left.isPointer).toBeTruthy();
+    expect(left.offset).toBe(8);
+    expect(left.scale).toBe(4);
+    expect(left.baseRegister).toBe('');
   });
 
   it('can parse add instructions', () => {
@@ -165,6 +187,10 @@ function checkMoveInstruction(instruction: Instruction) {
   const moveInstruction = instruction as MoveInstruction;
   checkConstant(moveInstruction.left, 1);
   checkRegister(moveInstruction.right, QuadRegister.rax);
+}
+
+function checkBytes(accessor: MemWriter | MemReader, expectedBytes: number) {
+  expect((accessor as RegisterAccessor).bytes).toBe(expectedBytes);
 }
 
 function checkPopInstruction(instruction: Instruction) {
