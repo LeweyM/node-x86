@@ -7,9 +7,13 @@
 * ~~saving to different bytes of same registers~~
 * ~~push to stack~~
 * ~~pop stack~~
-* compare
-* sign extension
-* jump less
+* ~~compare
+* ~~sign extension
+* ~~jump less
+* ~~sized memory reading/writing
+
+## Nice to have
+
 * multiplication instruction
 * bit shift
 * or
@@ -19,3 +23,4 @@
 * decrement
 * negate
 * complement
+* 

@@ -81,9 +81,14 @@ export class Parser {
           this.getWriterAccessor(line[2]),
         ),
       );
-    } else if (line[0].startsWith('cmpl')) {
+    } else if (line[0].startsWith('cmp')) {
+      const bytes = this.parseBytes(line[0][3]);
       instructions.addInstruction(
-        new CompareInstruction(e, this.getWriterAccessor(line[1]), this.getWriterAccessor(line[2])),
+        new CompareInstruction(
+          e,
+          this.getWriterAccessor(line[1], bytes),
+          this.getWriterAccessor(line[2], bytes),
+        ),
       );
     } else if (line[0].startsWith('cltq')) {
       instructions.addInstruction(
@@ -102,6 +107,7 @@ export class Parser {
 
   private parseBytes(letter: string): number {
     const map: Record<string, number> = { q: 8, l: 4, w: 2, b: 1 };
+    if (!map[letter]) throw new Error(`cannot parse word size '${letter}'`);
     return map[letter];
   }
 

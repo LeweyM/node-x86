@@ -29,9 +29,17 @@ describe('parser', () => {
   it('can parse move instructions of different sizes', () => {
     checkBytes((getInstruction('movq $1, %rax') as MoveInstruction).right, 8);
     checkBytes((getInstruction('movl $1, %rax') as MoveInstruction).right, 4);
-    checkBytes((getInstruction('movl %rax, %eax') as MoveInstruction).left, 4);
     checkBytes((getInstruction('movw $1, %rax') as MoveInstruction).right, 2);
     checkBytes((getInstruction('movb $1, %rax') as MoveInstruction).right, 1);
+    checkBytes((getInstruction('movl %rax, %eax') as MoveInstruction).left, 4);
+  });
+
+  it('can parse compare instructions of different sizes', () => {
+    checkBytes((getInstruction('cmpq %rsi, %rax') as CompareInstruction).right, 8);
+    checkBytes((getInstruction('cmpl %rsi, %rax') as CompareInstruction).right, 4);
+    checkBytes((getInstruction('cmpw %rsi, %rax') as CompareInstruction).right, 2);
+    checkBytes((getInstruction('cmpb %rsi, %rax') as CompareInstruction).right, 1);
+    checkBytes((getInstruction('cmpl %rax, %rax') as CompareInstruction).left, 4);
   });
 
   it('can parse add instructions of different sizes', () => {
