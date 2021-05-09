@@ -5,7 +5,7 @@ import { Registers } from './registers/registers';
 export class Emulator {
   registers: Registers;
   instructionSet: InstructionSet;
-  bytes: Uint8Array = new Uint8Array(1000);
+  bytes: Uint8Array = new Uint8Array(800);
   zeroCond: boolean;
   overflowCond: boolean;
   signCond: boolean;
@@ -18,20 +18,35 @@ export class Emulator {
   }
 
   writeBytesToMemory(_bytes: number, address: number, val: bigint): void {
+    console.log('writeBytesToMemory');
+    console.log({ _bytes });
+    console.log({ address });
+    console.log({ val });
+
+    const valHex = val.toString(16).padStart(_bytes * 2, '0');
+    console.log({ valHex });
+    const reversedValhex = reverseBytes(valHex);
+    console.log({ reversedValhex });
     for (let i = 0; i < _bytes; i++) {
-      const mask: bigint = (BigInt(2) ** BigInt(8) - BigInt(1)) << BigInt(8 * i);
-      const res = (val & BigInt(mask)) >> BigInt(8 * i);
-      const index = address + _bytes - (i + 1);
-      this.bytes[index] = Number(res);
+      const index = address + i;
+      const hex = '0x' + reversedValhex[i * 2] + reversedValhex[i * 2 + 1];
+      this.bytes[index] = Number(hex);
     }
   }
   readBytesFromMemory(_bytes: number, address: bigint): bigint {
-    let v = BigInt.asIntN(_bytes * 8, BigInt(0));
+    console.log('readBytesFromMemory');
+    console.log({ _bytes });
+    console.log({ address });
+
+    let binaryString = '';
     for (let i = 0; i < _bytes; i++) {
-      const byte = BigInt(this.bytes[Number(address) + i]);
-      v += byte << BigInt(8 * (_bytes - 1 - i));
+      const hex = this.bytes[Number(address) + i].toString(16);
+      binaryString += hex.padStart(2, '0');
     }
-    return v;
+    binaryString = '0x' + reverseBytes(binaryString);
+    console.log({ binaryString });
+    console.log({ numBinaryString: BigInt(binaryString) });
+    return BigInt(binaryString);
   }
 
   zeroFlag(): boolean {
@@ -57,7 +72,7 @@ export class Emulator {
       'REG: ',
       this.registers.registerData.reduce<any>((prev, curr, i) => {
         if (curr > BigInt(0)) {
-          prev[Object.keys(allRegisters).slice(0, 17)[i]] = curr;
+          prev[Object.keys(allRegisters).slice(0, 17)[i]] = curr.toString(16);
         }
         return prev;
       }, {}),
@@ -77,4 +92,18 @@ export class Emulator {
       this.step();
     }
   }
+}
+
+function reverseBytes(input: string): string {
+  const bytes = [];
+  const hex = input.split('');
+  for (let i = 0; i < hex.length; i += 2) {
+    const char1 = hex[i];
+    const char2 = hex[i + 1];
+    bytes.push([char1, char2]);
+  }
+  let res: string[] = [];
+  bytes.reverse().forEach((a) => (res = res.concat(a)));
+
+  return res.join('');
 }

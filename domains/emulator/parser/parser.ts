@@ -33,13 +33,23 @@ export class Parser {
 
   private parseLine(line: string[], instructions: InstructionSet, e: Emulator) {
     if (line[0].startsWith('mov')) {
+      const bytes = this.parseBytes(line[0][3]);
       instructions.addInstruction(
-        new MoveInstruction(e, this.getReaderAccessor(line[1]), this.getWriterAccessor(line[2])),
+        new MoveInstruction(
+          e,
+          this.getReaderAccessor(line[1], bytes),
+          this.getWriterAccessor(line[2], bytes),
+        ),
       );
       return;
     } else if (line[0].startsWith('add')) {
+      const bytes = this.parseBytes(line[0][3]);
       instructions.addInstruction(
-        new AddInstruction(e, this.getReaderAccessor(line[1]), this.getWriterAccessor(line[2])),
+        new AddInstruction(
+          e,
+          this.getReaderAccessor(line[1], bytes),
+          this.getWriterAccessor(line[2], bytes),
+        ),
       );
       return;
     } else if (line[0].startsWith('sub')) {
@@ -90,35 +100,93 @@ export class Parser {
     }
   }
 
-  private getWriterAccessor(input: string): MemReader & MemWriter {
-    return this.parseRegister(input);
+  private parseBytes(letter: string): number {
+    const map: Record<string, number> = { q: 8, l: 4, w: 2, b: 1 };
+    return map[letter];
   }
 
-  private getReaderAccessor(input: string): MemReader {
+  private getWriterAccessor(input: string, bytes = 8): MemReader & MemWriter {
+    return this.parseRegister(input, bytes);
+  }
+
+  private getReaderAccessor(input: string, bytes = 8): MemReader {
     if (input.startsWith('$')) {
       return new ImmediateSource(BigInt(parseInt(input.replace(remove, ''), 10)));
     } else {
-      return this.parseRegister(input);
+      return this.parseRegister(input, bytes);
     }
   }
 
-  private parseRegister(input: string): RegisterAccessor {
-    const regex = /(-?\d+)?(\()?(%[a-z]+)?,?(%[a-z]+),?(\d+)?\)?/;
+  private parseRegister(input: string, bytes: number): RegisterAccessor {
+    if (input.endsWith(',')) {
+      input = input.slice(0, input.length - 1);
+    }
+    if (/,.*,/.test(input)) {
+      const regex = /(-?\d+)?\((%[a-z]+)?,(%[a-z]+),(\d+)?\)/;
+      const match = input.match(regex);
+      if (!match) {
+        throw new Error('cannot parse input:' + input);
+      }
+
+      const offset = match[1] ? parseInt(match[1], 10) : undefined;
+      const isPointer = true;
+      const baseRegister = (match[2] ? match[2].replace(remove, '') : '') as RegisterId;
+      const indexRegister = match[3].replace(remove, '') as RegisterId;
+      const scale = match[4] && parseInt(match[4], 10);
+
+      return new RegisterAccessor(
+        baseRegister,
+        isPointer,
+        offset,
+        scale as 1 | 2 | 4 | 8,
+        indexRegister,
+        bytes,
+      );
+    }
+
+    const commas = input.match(/,/g);
+    if (commas && commas.length == 1) {
+      const regex = /(-?\d+)?\((%[a-z]+)?,(%[a-z]+)\)/;
+      const match = input.match(regex);
+      if (!match) {
+        throw new Error('cannot parse input:' + input);
+      }
+
+      const offset = match[1] ? parseInt(match[1], 10) : undefined;
+      const isPointer = true;
+      const baseRegister = match[2] ? (match[2].replace(remove, '') as RegisterId) : '';
+      const indexRegister = match[3].replace(remove, '') as RegisterId;
+      const scale = match[4] && parseInt(match[4], 10);
+
+      return new RegisterAccessor(
+        indexRegister,
+        isPointer,
+        offset,
+        scale as 1 | 2 | 4 | 8,
+        baseRegister,
+        bytes,
+      );
+    }
+
+    const regex = /(-?\d+)?(\()?(%[a-z]+)\)?/;
     const match = input.match(regex);
     if (!match) {
-      throw new Error('cannot parse');
+      throw new Error('cannot parse input:' + input);
     }
+
     const offset = match[1] ? parseInt(match[1], 10) : undefined;
     const isPointer = match[2] == '(';
-    const indexRegister = match[3] && (match[3].replace(remove, '') as RegisterId);
-    const baseRegister = match[4].replace(remove, '') as RegisterId;
-    const scale = match[5] && parseInt(match[5], 10);
+    const baseRegister = match[3].replace(remove, '') as RegisterId;
+    const indexRegister = '';
+    const scale = 1;
+
     return new RegisterAccessor(
       baseRegister,
       isPointer,
       offset,
       scale as 1 | 2 | 4 | 8,
       indexRegister,
+      bytes,
     );
   }
 }

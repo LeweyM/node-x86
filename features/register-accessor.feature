@@ -44,10 +44,10 @@ Feature: Accessor
 
   Scenario: register pointer accessor with index register, offset and scale, and no base register
     Given an Emulator with no instructions
-    And register rax is set to 2
+    And register al is set to 2
     And a register accessor with the following parameters
       | register | isPointer | offset | scale | indexReg |
-      |          | true      | 4      | 4     | rax      |
+      |          | true      | 4      | 4     | al      |
     When the accessor writes 11
     # 12 == 4 + (4 * 2)
     Then memory address 12 should have value 11 

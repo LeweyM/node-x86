@@ -88,7 +88,7 @@ When('emulator has run', async function () {
 });
 
 Then('memory address {int} should have value {int}', async function (memAddress, value: number) {
-  expect(this.emulator.readBytesFromMemory(8, memAddress)).toEqual(BigInt(value));
+  expect(this.emulator.readBytesFromMemory(1, memAddress)).toEqual(BigInt(value));
 });
 
 Then('register {word} should have value {int}', async function (reg: string, val: number) {
